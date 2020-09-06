@@ -1,5 +1,6 @@
 import os
 from nfp.telas.nfp import Nfp
+from nfp.utilitarios.arquivos import extrair_dados_planilhas, inserir_linha_arq_csv
 
 
 def gravar_nota(cod_nota, tela):
@@ -8,39 +9,34 @@ def gravar_nota(cod_nota, tela):
 
 
 def gravar_notas():
-    notas = [
-        '35200713574594023480590008047871044653273229',
-        '35200713574594023480590008047871044957896722',
-        '35200713574594023480590008047871044969829596',
-        '35200713574594023480590008047871044984635322',
-        '35200713574594023480590008047871045101507791',
-        '35200713574594023480590008047871044696054332',
-        '35200713574594023480590008047871044796028724',
-        '35200713574594023480590008047871044840250946',
-        '35200713574594023480590008047871044901873794',
-        '35200713574594023480590008047871045175496955',
-        '35200713574594023480590008047871045190254576',
-    ]
+    plan = r"C:\Users\franc\Documents\Notas fiscais 2020\agosto\teste_1.xlsx"
+    linhas = extrair_dados_planilhas(plan)
     usuario = os.environ['USER_NFP']
     senha = os.environ['SENHA_NFP']
     mes = '08'
     ano = '2020'
     entidade = 'CREN - CENTRO DE RECUPERAÇÃO E EDUCAÇÃO NUTRICIONAL'
     tela = Nfp(usuario, senha, mes, ano, entidade)
-    retorno = tela.abrir_pagina_login()
-    if retorno:
-        return retorno, None
-    retorno = tela.logar()
-    if retorno:
-        return retorno, None
+    # retorno = tela.abrir_pagina_login()
+    # if retorno:
+    #     return retorno, None
+    # retorno = tela.logar()
+    # if retorno:
+    #     return retorno, None
     tela.configurar_cadastro()
     i = 1
-    for cod_nota in notas:
+    arq_result = r"C:\Users\franc\Documents\Notas fiscais 2020\agosto\result_teste_1.csv"
+    for linha in linhas:
+        cod_nota = linha[0]
         retorno = gravar_nota(cod_nota, tela)
         print('NF {} Retorno: {}'.format(i, retorno))
         i += 1
+        inserir_linha_arq_csv(arq_result, [cod_nota, retorno])
 
 
 # ---------------------------------
 if __name__ == "__main__":
+    # Executar antes:
+    # chrome.exe --remote-debugging-port=9222 --user-data-dir="C:\DevApps\source\Robo_NFP_Selenium\prefs_chrome"
+    # https://www.nfp.fazenda.sp.gov.br
     gravar_notas()
