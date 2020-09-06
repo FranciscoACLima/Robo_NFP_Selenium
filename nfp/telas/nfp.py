@@ -1,8 +1,7 @@
 """ Módulo para controle das telas do sistema Nota Fiscal Paulista
 """
-import json
 from selenium import webdriver
-# from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from nfp import CHRDRIVER
 import time
@@ -14,37 +13,18 @@ class Nfp():
 
     url = r'https://www.nfp.fazenda.sp.gov.br/EntidadesFilantropicas/CadastroNotaEntidadeAviso.aspx'
     exec_path = CHRDRIVER
-    default_wait = 15
-    implicitly_wait = 5
+    default_wait = 30
+    implicitly_wait = 15
     default_sleep = 2
 
-    def __init__(self, cod_nota, usuario, senha, mes, ano, entidade, driver=None):
-        self.cod_nota = cod_nota
+    def __init__(self, usuario, senha, mes, ano, entidade):
         self.usuario = usuario
         self.senha = senha
         self.mes = mes
         self.ano = ano
         self.entidade = entidade
-        if driver:
-            self.driver = driver
-            return
         options = webdriver.ChromeOptions()
-        print_settings = {
-            "recentDestinations": [{
-                "id": "Save as PDF",
-                "origin": "local",
-                "account": "",
-            }],
-            "selectedDestinationId": "Save as PDF",
-            "version": 2,
-        }
-        prefs = {
-            'printing.print_preview_sticky_settings.appState': json.dumps(print_settings),
-        }
-        options.add_experimental_option('prefs', prefs)
-        options.add_argument('--kiosk-printing')
-        # options.add_argument("--start-maximized")
-        options.add_experimental_option("excludeSwitches", ["enable-logging"])
+        options.add_experimental_option("debuggerAddress", "127.0.0.1:9222")
         self.driver = webdriver.Chrome(options=options, executable_path=self.exec_path)
         self.driver.implicitly_wait(self.implicitly_wait)
         self.driver.set_page_load_timeout(self.default_wait)
@@ -67,6 +47,7 @@ class Nfp():
         return
 
     def configurar_cadastro(self, tentativa=0):
+        logging.info('Configurando cadastro - entidade, mes/ano')
         try:
             self.driver.get(self.url)
             elem = self.driver.find_element_by_id('ctl00_ConteudoPagina_btnOk')
@@ -84,7 +65,7 @@ class Nfp():
         elem = self.driver.find_element_by_id('ctl00_ConteudoPagina_btnNovaNota')
         elem.click()
         self._confirmar_msg()
-        sg.popup_auto_close('Tela de Cadastro Configurada', auto_close_duration=3)
+        logging.info('Entidade, mes/ano configurados')
         return
 
     def _confirmar_msg(self):
@@ -93,6 +74,41 @@ class Nfp():
             elem.click()
         except Exception:
             pass
+
+    def gravar_nota(self, cod_nota, tentativa=0):
+        tentativa += 1
+        try:
+            elem = self.driver.find_element_by_xpath("//fieldset/div[4]/fieldset/input")
+        except Exception:
+            if tentativa < 4:
+                self.configurar_cadastro()
+                return self.gravar_nota(cod_nota, tentativa)
+            return 'ERRO: erro ao gravar a NF'
+        elem.clear()
+        elem.send_keys(cod_nota)
+        time.sleep(1)
+        elem.send_keys(Keys.ENTER)
+        time.sleep(1)
+        try:
+            elem = self.driver.find_element_by_xpath('//*[@id="ConteudoPrincipal"]/div[2]/div[1]')
+            logging.info(elem.text)
+            if 'Doação registrada com sucesso' in elem.text:
+                return 'OK - NF gravada'
+            if 'Este pedido já existe no sistema' in elem.text:
+                return 'NF ja existe'
+            if 'Ocorreu um erro inesperado' in elem.text:
+                if tentativa < 4:
+                    return self.gravar_nota(cod_nota, tentativa)
+                return 'ERRO: erro ao gravar a NF'
+        except NoSuchElementException:
+            try:
+                self.driver.find_elements_by_class_name('mensagemBemVindo')
+                if tentativa < 4:
+                    self.configurar_cadastro()
+                    return self.gravar_nota(cod_nota, tentativa)
+                return 'ERRO: erro ao gravar a NF'
+            except Exception:
+                return 'ERRO: erro ao gravar a NF'
 
     def logar(self):
         elem = self.driver.find_element_by_id('UserName')
@@ -125,9 +141,3 @@ class Nfp():
                 option.click()
                 break
         return
-
-    def __del__(self):
-        try:
-            self.driver.quit()
-        except Exception:
-            pass
