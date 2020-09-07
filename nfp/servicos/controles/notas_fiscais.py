@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 import nfp.servicos.model as tables
-import nfp.servicos.controle_execucao as ctrlexec
+import nfp.servicos.controles.controle_execucao as ctrlexec
 from nfp.config import BASEDIR, URI
 
 
