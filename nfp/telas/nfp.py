@@ -1,17 +1,19 @@
 """ Módulo para controle das telas do sistema Nota Fiscal Paulista
+
 """
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-from selenium.common.exceptions import NoSuchElementException, TimeoutException
-from nfp import CHRDRIVER
 import time
 import logging
 import PySimpleGUI as sg
+from subprocess import Popen, PIPE
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
+from nfp.config import CHRDRIVER, CHREXEC, CHRPREFS, URLBASE
 
 
 class Nfp():
 
-    url = r'https://www.nfp.fazenda.sp.gov.br/EntidadesFilantropicas/CadastroNotaEntidadeAviso.aspx'
+    url = URLBASE
     exec_path = CHRDRIVER
     default_wait = 30
     implicitly_wait = 15
@@ -23,12 +25,20 @@ class Nfp():
         self.mes = mes
         self.ano = ano
         self.entidade = entidade
+        self._abrir_chrome()
         options = webdriver.ChromeOptions()
         options.add_experimental_option("debuggerAddress", "127.0.0.1:9222")
         self.driver = webdriver.Chrome(options=options, executable_path=self.exec_path)
         self.driver.implicitly_wait(self.implicitly_wait)
         self.driver.set_page_load_timeout(self.default_wait)
         return
+
+    def _abrir_chrome(self):
+        chrexec = '"{}" --remote-debugging-port=9222 --user-data-dir="{}" {}'.format(CHREXEC, CHRPREFS, URLBASE)
+        Popen(chrexec, shell=False, stdout=PIPE).stdout
+        msg = 'ROBÔ EM ESPERA\n\nPor favor faça o login e responda ao Captcha\n'
+        msg += 'em seguida feche este janela para iniciar a execução.\n'
+        sg.popup(msg)
 
     def abrir_pagina_login(self, tentativa=0):
         self.driver.get(self.url)
