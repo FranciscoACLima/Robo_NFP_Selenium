@@ -1,6 +1,6 @@
 import os
 from nfp.telas.nfp import Nfp
-from nfp.utilitarios.arquivos import extrair_dados_planilhas, inserir_linha_arq_csv
+from nfp.servicos.arquivos import extrair_dados_planilhas, inserir_linha_arq_csv
 
 
 def gravar_nota(cod_nota, tela):

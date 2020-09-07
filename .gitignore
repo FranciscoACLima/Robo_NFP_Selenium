@@ -130,3 +130,4 @@ dmypy.json
 .vscode/settings.json
 
 prefs_chrome
+nfp/controle_execucao.db
