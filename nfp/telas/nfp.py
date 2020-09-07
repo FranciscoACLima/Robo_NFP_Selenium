@@ -3,12 +3,12 @@
 """
 import time
 import logging
-import PySimpleGUI as sg
 from subprocess import Popen, PIPE
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from nfp.config import CHRDRIVER, CHREXEC, CHRPREFS, URLBASE
+from nfp.servicos.interface import abrir_popup
 
 
 class Nfp():
@@ -19,7 +19,7 @@ class Nfp():
     implicitly_wait = 15
     default_sleep = 2
 
-    def __init__(self, usuario, senha, mes, ano, entidade):
+    def __init__(self, mes, ano, entidade, usuario='', senha=''):
         self.usuario = usuario
         self.senha = senha
         self.mes = mes
@@ -36,9 +36,9 @@ class Nfp():
     def _abrir_chrome(self):
         chrexec = '"{}" --remote-debugging-port=9222 --user-data-dir="{}" {}'.format(CHREXEC, CHRPREFS, URLBASE)
         Popen(chrexec, shell=False, stdout=PIPE).stdout
-        msg = 'ROBÔ EM ESPERA\n\nPor favor faça o login e responda ao Captcha\n'
-        msg += 'em seguida feche este janela para iniciar a execução.\n'
-        sg.popup(msg)
+        msg = 'ROBÔ EM ESPERA\n\nFaça o login no sistema e responda ao captcha.\n'
+        msg += 'Após o login, feche esta janela para iniciar a execução.\n'
+        abrir_popup(msg)
 
     def abrir_pagina_login(self, tentativa=0):
         self.driver.get(self.url)
@@ -57,26 +57,27 @@ class Nfp():
         return
 
     def configurar_cadastro(self, tentativa=0):
-        logging.info('Configurando cadastro - entidade, mes/ano')
+        tentativa += 1
+        logging.info('Configurando cadastro entidade, mês e ano')
         try:
-            self.driver.get(self.url)
             elem = self.driver.find_element_by_id('ctl00_ConteudoPagina_btnOk')
             elem.click()
-        except TimeoutException:
+            self.selecionar('ddlEntidadeFilantropica', self.entidade)
+            time.sleep(1)
+            self.selecionar('ctl00_ConteudoPagina_ddlMes', self.mes)
+            time.sleep(1)
+            self.selecionar('ctl00_ConteudoPagina_ddlAno', self.ano)
+            time.sleep(1)
+            elem = self.driver.find_element_by_id('ctl00_ConteudoPagina_btnNovaNota')
+            elem.click()
+            self._confirmar_msg()
+            logging.info('Cadastro entidade, mês e ano configurado')
+            return
+        except Exception as e:
             if tentativa < 3:
-                tentativa += 1
+                self.driver.get(self.url)
                 return self.configurar_cadastro(tentativa)
-        self.selecionar('ddlEntidadeFilantropica', self.entidade)
-        time.sleep(1)
-        self.selecionar('ctl00_ConteudoPagina_ddlMes', self.mes)
-        time.sleep(1)
-        self.selecionar('ctl00_ConteudoPagina_ddlAno', self.ano)
-        time.sleep(1)
-        elem = self.driver.find_element_by_id('ctl00_ConteudoPagina_btnNovaNota')
-        elem.click()
-        self._confirmar_msg()
-        logging.info('Entidade, mes/ano configurados')
-        return
+            raise e
 
     def _confirmar_msg(self):
         try:
@@ -86,11 +87,12 @@ class Nfp():
             pass
 
     def gravar_nota(self, cod_nota, tentativa=0):
+        logging.info('Gravando nota fiscal...')
         tentativa += 1
         try:
             elem = self.driver.find_element_by_xpath("//fieldset/div[4]/fieldset/input")
         except Exception:
-            if tentativa < 4:
+            if tentativa < 3:
                 self.configurar_cadastro()
                 return self.gravar_nota(cod_nota, tentativa)
             return 'ERRO: erro ao gravar a NF'
@@ -98,7 +100,7 @@ class Nfp():
         elem.send_keys(cod_nota)
         time.sleep(1)
         elem.send_keys(Keys.ENTER)
-        time.sleep(1)
+        time.sleep(5)
         try:
             elem = self.driver.find_element_by_xpath('//*[@id="ConteudoPrincipal"]/div[2]/div[1]')
             logging.info(elem.text)
@@ -107,18 +109,15 @@ class Nfp():
             if 'Este pedido já existe no sistema' in elem.text:
                 return 'NF ja existe'
             if 'Ocorreu um erro inesperado' in elem.text:
-                if tentativa < 4:
+                if tentativa < 3:
                     return self.gravar_nota(cod_nota, tentativa)
                 return 'ERRO: erro ao gravar a NF'
-        except NoSuchElementException:
-            try:
-                self.driver.find_elements_by_class_name('mensagemBemVindo')
-                if tentativa < 4:
-                    self.configurar_cadastro()
-                    return self.gravar_nota(cod_nota, tentativa)
-                return 'ERRO: erro ao gravar a NF'
-            except Exception:
-                return 'ERRO: erro ao gravar a NF'
+            return elem.text
+        except Exception:
+            if tentativa < 3:
+                self.configurar_cadastro()
+                return self.gravar_nota(cod_nota, tentativa)
+            return 'ERRO: erro ao gravar a NF'
 
     def logar(self):
         elem = self.driver.find_element_by_id('UserName')
@@ -133,7 +132,7 @@ class Nfp():
         self.recaptcha.click()
         msg = 'ROBÔ EM ESPERA\nPor favor responda ao Captcha e em seguida feche'
         msg += '\nessa janela para o robô continuar sua execução.'
-        sg.popup(msg)
+        abrir_popup(msg)
         time.sleep(1)
         elem = self.driver.find_element_by_id('Login')
         elem.click()

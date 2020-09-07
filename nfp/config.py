@@ -2,7 +2,7 @@
 import os
 import logging
 
-DEBUG = True
+DEBUG = False
 
 URLBASE = r'https://www.nfp.fazenda.sp.gov.br/EntidadesFilantropicas/CadastroNotaEntidadeAviso.aspx'
 
