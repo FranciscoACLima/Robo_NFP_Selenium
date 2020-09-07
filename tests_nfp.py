@@ -36,7 +36,4 @@ def gravar_notas():
 
 # ---------------------------------
 if __name__ == "__main__":
-    # Executar antes:
-    # chrome.exe --remote-debugging-port=9222 --user-data-dir="C:\DevApps\source\Robo_NFP_Selenium\prefs_chrome"
-    # https://www.nfp.fazenda.sp.gov.br
     gravar_notas()
