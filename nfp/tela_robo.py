@@ -113,11 +113,73 @@ class TelaRobo(object):
             [sg.Text(texto2, size=(35, 2), font=self.font_titulo)],
         ]
 
-    def col_direita_notas_fiscais(self, prefixo):
+    def arquivo_entrada(self, prefixo):
+        """ Arquivo de entrada para os robôs
+
+            Retorna uma linha
+        """
+        ajuda = 'Prepare a planilha de acordo com as\n'
+        ajuda += 'informações contidas na coluna ao lado'
         return [
-            [sg.Text('Grava Notas Fiscais')],
-            [sg.Text(prefixo)],
+            sg.Text('Planilha de Entrada:', size=(15, 1), font=self.font_label),
+            sg.Input(self.get_cfg_win(prefixo + 'arquivo_entrada'),
+                     key=prefixo + 'arquivo_entrada', size=(47, 1),
+                     font=self.font_input,
+                     tooltip=ajuda),
+            sg.FileBrowse('Buscar', font=self.font_bt_menor)
         ]
+
+    def sel_mes(self, prefixo):
+        meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho',
+                 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro']
+        valor = self.get_cfg_win(prefixo + 'mes')
+        if not valor:
+            valor = 'Janeiro'
+        return [
+            sg.Text('Mês de referência:', size=(15, 1), font=self.font_label),
+            sg.Combo(values=meses, key=prefixo + 'mes',
+                     size=(42, 1), default_value=valor,
+                     font=self.font_input, readonly=True)
+        ]
+
+    def sel_ano(self, prefixo):
+        import datetime
+        now = datetime.datetime.now()
+        ano_atual = now.year
+        ano_anterior = str(int(ano_atual - 1))
+        meses = [ano_anterior, ano_atual]
+        valor = self.get_cfg_win(prefixo + 'ano')
+        if not valor:
+            valor = ano_atual
+        return [
+            sg.Text('Ano de referência:', size=(15, 1), font=self.font_label),
+            sg.Combo(values=meses, key=prefixo + 'ano',
+                     size=(42, 1), default_value=valor,
+                     font=self.font_input, readonly=True)
+        ]
+
+    def sel_entidade(self, prefixo):
+        valor = self.get_cfg_win(prefixo + 'entidade')
+        if not valor:
+            valor = 'CREN - CENTRO DE RECUPERAÇÃO E EDUCAÇÃO NUTRICIONAL'
+        return [
+            sg.Text('Entidade:', size=(7, 1), font=self.font_label),
+            sg.Input(valor, key=prefixo + 'entidade', size=(64, 1),
+                     font=self.font_input)
+        ]
+
+    def col_direita_notas_fiscais(self, prefixo):
+        layout = []
+        tam = 66
+        layout.append([sg.Text(' ' * tam)])
+        if not self.get_tarefa_ativa(prefixo):
+            layout.append(self.arquivo_entrada(prefixo))
+        layout.append(self.sel_mes(prefixo))
+        layout.append(self.sel_ano(prefixo))
+        layout.append([sg.Text(' ' * tam)])
+        layout.append([sg.Text(' ' * tam)])
+        layout.append(self.sel_entidade(prefixo))
+        return layout
 
     def get_tarefa_ativa(self, nome_robo):
         try:
