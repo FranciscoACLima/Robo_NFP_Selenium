@@ -22,8 +22,8 @@ class Nfp():
     def __init__(self, mes, ano, entidade, usuario='', senha=''):
         self.usuario = usuario
         self.senha = senha
-        self.mes = mes
-        self.ano = ano
+        self.mes = str(mes)
+        self.ano = str(ano)
         self.entidade = entidade
         self._abrir_chrome()
         options = webdriver.ChromeOptions()

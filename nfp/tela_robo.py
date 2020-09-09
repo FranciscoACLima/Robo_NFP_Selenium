@@ -1,9 +1,11 @@
 """Módulo para carregamento da tela
 """
 import os
+import time
 import PySimpleGUI as sg
 from nfp.servicos.arquivos import abrir_json, adicionar_dados_json, criar_json_dados_robos
-from nfp.config import BASEDIR
+from nfp.robos.controlador_robos import ControladorRobos
+from nfp.config import BASEDIR, DIR_RESULT
 import importlib as il
 
 
@@ -77,6 +79,10 @@ class TelaRobo(object):
     @property
     def robo_ativo(self):
         return self._robo_ativo
+
+    @property
+    def dir_saida(self):
+        return DIR_RESULT
 
     @robo_ativo.setter
     def robo_ativo(self, cod_robo):
@@ -357,6 +363,13 @@ class TelaRobo(object):
             elemento = window.Element(robo['cod'])
             elemento.Update(visible=visivel)
 
+    def _gravar_campos_tela(self, values):
+        for chave in values:
+            if 'senha' in str(chave) or 'arquivo_entrada' in str(chave):
+                self.add_cfg_win(chave, '')
+            else:
+                self.add_cfg_win(chave, values[chave])
+
     def main(self):
         ultimo_robo = self.get_cfg_win('robo_selecionado')
         if not ultimo_robo:
@@ -375,13 +388,92 @@ class TelaRobo(object):
                 window.Close()
                 return
             if 'executar' in event:
-                self.executar_robo()
-                return
+                values[self.robo_ativo['cod'] + 'dir_saida'] = self.dir_saida
+                self._gravar_campos_tela(values)
+                sg.PopupAutoClose(
+                    ' Robô em execução. tecle \n ___ ALT + SHIFT + C ___ \n para abortar a tarefa',
+                    auto_close_duration=5)
+                window.Close()
+                try:
+                    retorno = ControladorRobos().main(self.robo_ativo['cod'], values)
+                except KeyboardInterrupt:
+                    retorno = "Execução interrompida pelo usuário"
+                if retorno:
+                    sg.Popup(retorno)
+                return self.main()
+            if 'abortar_tarefa' in event:
+                retorno = self.abortar_tarefa(values)
+                if retorno != 'Não':
+                    sg.Popup(str(retorno))
+                if self.reiniciar_tela:
+                    window.Close()
+                    return self.main()
+                event, values = window.Read()
+                continue
+            if 'extrair_resultados' in event:
+                retorno = self.extrair_resultados(values)
+                msg = str(retorno[0])
+                if 'criada com sucesso' in retorno[0].lower():
+                    msg += '\nAguarde... Abrindo a planilha.'
+                    try:
+                        os.startfile(retorno[1])
+                    except Exception:
+                        pass
+                sg.PopupAutoClose(msg, auto_close_duration=5)
+                if self.reiniciar_tela:
+                    window.Close()
+                    return self.main()
+                event, values = window.Read()
+                continue
+            if '::sobre' in event:
+                # sobre.run()
+                event, values = window.Read()
+                continue
+            if '::config_maquina' in event:
+                # config_maquina.run()
+                event, values = window.Read()
+                continue
             self.seleciona_robos(window, event)
             event, values = window.Read()
 
-    def executar_robo(self):
-        sg.popup('Executar selecionado')
+    def extrair_resultados(self, values):
+        self.reiniciar_tela = False
+        nome_robo = self.robo_ativo['cod']
+        package = "nfp.servicos.controles.{}".format(nome_robo)
+        ctrl = il.import_module(package)
+        tarefa = self.get_tarefa_ativa(nome_robo)
+        if not tarefa:
+            tarefa = self.get_ultima_tarefa_finalizada(nome_robo)
+            if not tarefa:
+                return 'Não consta nenhuma tarefa para este robô\n'
+        tarefa_id = tarefa.id
+        diretorio = self.dir_saida
+        data_hora = time.strftime("%Y%m%d-%H%M", time.gmtime())
+        arquivo = os.path.join(
+            diretorio,
+            'result_' + str(tarefa_id) + '_' + self.robo_ativo['cod'] + '_' + data_hora + '.xlsx'
+        )
+        retorno = ctrl.extrair_dados_tarefa(tarefa_id, arquivo)
+        return retorno[1], arquivo
+
+    def abortar_tarefa(self, values):
+        self.reiniciar_tela = False
+        nome_robo = self.robo_ativo['cod']
+        package = "nfp.servicos.controles.{}".format(nome_robo)
+        ctrl = il.import_module(package)
+        tarefa = self.get_tarefa_ativa(nome_robo)
+        if not tarefa:
+            return 'Não consta tarefa em andamento para este robô\n'
+        msg = 'Deseja realmente abortar a tarefa atual?\n'
+        resultado = sg.Popup(msg, custom_text=('Sim', 'Não'))
+        if resultado == 'Não':
+            return resultado
+        if ctrl.finalizar_tarefa_ativa():
+            msg = 'Tarefa abortada.\n'
+            self.reiniciar_tela = True
+        else:
+            msg = 'Tarefa não foi abortada, tente novamente.\n'
+        return msg
 
 
 # ------------------------------

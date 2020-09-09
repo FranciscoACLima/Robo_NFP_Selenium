@@ -17,3 +17,5 @@ CHRPREFS = r"C:\DevApps\source\Robo_NFP_Selenium\prefs_chrome"
 URI = os.path.join(BASEDIR, 'controle_execucao.db')
 
 logging.info('CHRDRIVER: {}'.format(CHRDRIVER))
+
+DIR_RESULT = os.path.join(BASEDIR, 'resultados')
