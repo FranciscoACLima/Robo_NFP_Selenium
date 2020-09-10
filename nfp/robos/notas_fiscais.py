@@ -7,10 +7,27 @@ from nfp.telas.nfp import Nfp
 
 class CadastraNFP():
 
+    meses = {
+        'Janeiro': '01',
+        'Fevereiro': '02',
+        'Março': '03',
+        'Abril': '04',
+        'Maio': '05',
+        'Junho': '06',
+        'Julho': '07',
+        'Agosto': '08',
+        'Setembro': '09',
+        'Outubro': '10',
+        'Novembro': '11',
+        'Dezembro': '12'
+    }
+
     def __init__(self, parametros):
         self.entidade = parametros['entidade']
-        self.mes = parametros['mes']
+        self.mes = self.meses[parametros['mes']]
         self.ano = parametros['ano']
+        logging.info('Mês/Ano: {}/{}'.format(self.mes, self.ano))
+        logging.info('Entidade: {}'.format(self.entidade))
 
     def main(self):
         tela = None

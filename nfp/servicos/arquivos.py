@@ -1,5 +1,32 @@
+import os
 import xlrd
 import csv
+import json
+
+
+def abrir_json(path):
+    try:
+        with open(path, 'r', encoding='utf-8') as read_file:
+            return json.load(read_file)
+    except Exception:
+        return None
+
+
+def adicionar_dados_json(path, dados):
+    try:
+        with open(path, 'w') as write_file:
+            json.dump(dados, write_file)
+    except Exception as e:
+        raise e
+
+
+def criar_json_dados_robos(dir_config, nome_arquivo_robos):
+    if not os.path.exists(dir_config):
+        os.makedirs(dir_config)
+    path_arquivo = os.path.join(dir_config, nome_arquivo_robos)
+    if not os.path.exists(path_arquivo):
+        with open(path_arquivo, 'w') as write_file:
+            write_file.write("{}")
 
 
 def extrair_dados_planilhas(arquivo, titulos=[], filtros=[]):
