@@ -7,6 +7,7 @@ from subprocess import Popen, PIPE
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from nfp.config import CHRDRIVER, CHREXEC, CHRPREFS, URLBASE
 from nfp.servicos.interface import abrir_popup
 
@@ -15,7 +16,7 @@ class Nfp():
 
     url = URLBASE
     exec_path = CHRDRIVER
-    default_wait = 30
+    default_wait = 20
     implicitly_wait = 15
     default_sleep = 2
 
@@ -26,9 +27,14 @@ class Nfp():
         self.ano = str(ano)
         self.entidade = entidade
         self._abrir_chrome()
+        caps = DesiredCapabilities().CHROME
+        # caps["pageLoadStrategy"] = "normal"  #  complete
+        # caps["pageLoadStrategy"] = "eager"  #  interactive
+        caps["pageLoadStrategy"] = "none"
+
         options = webdriver.ChromeOptions()
         options.add_experimental_option("debuggerAddress", "127.0.0.1:9222")
-        self.driver = webdriver.Chrome(options=options, executable_path=self.exec_path)
+        self.driver = webdriver.Chrome(options=options, executable_path=self.exec_path, desired_capabilities=caps)
         self.driver.implicitly_wait(self.implicitly_wait)
         self.driver.set_page_load_timeout(self.default_wait)
         return
@@ -108,7 +114,7 @@ class Nfp():
                 return 'OK - NF gravada'
             if 'Este pedido já existe no sistema' in elem.text:
                 return 'NF ja existe'
-            if 'Ocorreu um erro inesperado' in elem.text:
+            if 'Ocorreu um erro inesperado' in elem.text or 'COO/Número documento fiscal' in elem.text:
                 if tentativa < 3:
                     return self.gravar_nota(cod_nota, tentativa)
                 return 'ERRO: erro ao gravar a NF'

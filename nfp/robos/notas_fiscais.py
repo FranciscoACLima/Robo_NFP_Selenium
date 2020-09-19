@@ -50,10 +50,10 @@ class CadastraNFP():
 
     def retornar_resultado(self, retorno, entrada):
         log = 'Retorno: {}'.format(retorno)
-        logging.info(log)
         resultado = {'resultado': retorno}
         finalizar_execucao(self.id, resultado)
         ex, tot = contar_processos_executados(self.tarefa_id)
+        logging.info(str(ex) + ' - ' + log)
         texto = ' {} de {} notas carregadas'.format(ex, tot)
         abrir_popup(texto, 4)
 
