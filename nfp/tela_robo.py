@@ -12,13 +12,13 @@ import importlib as il
 class TelaRobo(object):
 
     JSON_CFG = 'config_window.json'
-    font_titulo = 'sfprodisplay 11 bold'
-    font_titulo_robo = 'sfprodisplay 23 bold'
-    font_label = 'sfprodisplay 10'
-    font_input = 'sfprodisplay 10'
-    font_texto = 'sfprodisplay 10'
-    font_bt_padrao = 'sfprodisplay 11'
-    font_bt_menor = 'sfprodisplay 9'
+    font_titulo = 'sfprodisplay 9 bold'
+    font_titulo_robo = 'sfprodisplay 22 bold'
+    font_label = 'sfprodisplay 9'
+    font_input = 'sfprodisplay 9'
+    font_texto = 'sfprodisplay 9'
+    font_bt_padrao = 'sfprodisplay 10'
+    font_bt_menor = 'sfprodisplay 8'
 
     def __init__(self):
         self.titulo = 'Robôs Nota Fiscal Paulista'

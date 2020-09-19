@@ -8,11 +8,11 @@ URLBASE = r'https://www.nfp.fazenda.sp.gov.br/EntidadesFilantropicas/CadastroNot
 
 BASEDIR = os.path.dirname(__file__)
 
-CHRDRIVER = os.path.join(BASEDIR, 'binaries', 'chromedriver.exe')
+CHRDRIVER = os.path.join(BASEDIR, 'binaries', 'chromedriver')
 
-CHREXEC = r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"
+CHREXEC = "google-chrome"
 
-CHRPREFS = r"C:\DevApps\source\Robo_NFP_Selenium\prefs_chrome"
+CHRPREFS = r"/home/gil-2004/Aplicacoes/Robo_NFP_Selenium/prefs_chrome"
 
 URI = os.path.join(BASEDIR, 'controle_execucao.db')
 

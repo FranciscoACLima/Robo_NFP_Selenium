@@ -77,7 +77,7 @@ def selecionar_ultima_tarefa_finalizada(uri=URI):
 
 
 def extrair_dados_tarefa(tarefa_id, arquivo, uri=URI):
-    from app_robos.servicos.xlsx import criar_planilha
+    from nfp.servicos.xlsx import criar_planilha
     registros = listar_dados_tarefa(tarefa_id, uri=uri)
     return criar_planilha(registros, arquivo)
 
@@ -97,7 +97,7 @@ def listar_dados_tarefa(tarefa_id, uri=URI):
 def test_criar_planilha():
     registros = extrair_dados_tarefa(1)
     arquivo = os.path.join(BASEDIR, 'teste.xlsx')
-    from app_robos.servicos.xlsx import criar_planilha
+    from nfp.servicos.xlsx import criar_planilha
     retorno = criar_planilha(registros, arquivo)
     print(retorno)
 
