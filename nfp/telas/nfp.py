@@ -10,7 +10,6 @@ from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from nfp.config import CHRDRIVER, CHREXEC, CHRPREFS, URLBASE
 from nfp.servicos.interface import abrir_popup
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 
 class Nfp():
@@ -28,15 +27,11 @@ class Nfp():
         self.ano = str(ano)
         self.entidade = entidade
         self._abrir_chrome()
-        caps = DesiredCapabilities().CHROME
-        # caps["pageLoadStrategy"] = "normal"  #  complete
-        # caps["pageLoadStrategy"] = "eager"  #  interactive
-        caps["pageLoadStrategy"] = "none"
-
         options = webdriver.ChromeOptions()
         caps = DesiredCapabilities().CHROME
         # caps["pageLoadStrategy"] = "normal"  #  espera a pagina estar carregada
-        caps["pageLoadStrategy"] = "none"
+        # caps["pageLoadStrategy"] = "eager"  #  interativa
+        caps["pageLoadStrategy"] = "none"  # não espera a página carregar
         options.add_experimental_option("debuggerAddress", "127.0.0.1:9222")
         self.driver = webdriver.Chrome(options=options, executable_path=self.exec_path, desired_capabilities=caps)
         self.driver.implicitly_wait(self.implicitly_wait)
@@ -93,6 +88,8 @@ class Nfp():
             return
         except Exception as e:
             if tentativa < 10:
+                time.sleep(5)
+                logging.info('Erro ao configurar cadastro. Tentando novamente...')
                 self.driver.get(self.url)
                 return self.configurar_cadastro(tentativa)
             raise e

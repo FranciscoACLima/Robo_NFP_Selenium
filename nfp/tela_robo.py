@@ -2,6 +2,7 @@
 """
 import os
 import time
+import platform
 import PySimpleGUI as sg
 from nfp.servicos.arquivos import abrir_json, adicionar_dados_json, criar_json_dados_robos
 from nfp.robos.controlador_robos import ControladorRobos
@@ -23,6 +24,13 @@ class TelaRobo(object):
     def __init__(self):
         self.titulo = 'Robôs Nota Fiscal Paulista'
         sg.ChangeLookAndFeel('GreenTan')
+        self.size_win = (967, 500)
+        self.left_ult_linha = 145
+        if platform.system() == 'Linux':
+            self.size_win = (952, 500)
+            self.font_titulo_robo = 'sfprodisplay 21 bold'
+            self.font_input = 'sfprodisplay 8'
+            self.left_ult_linha = 140
 
     @property
     def cfg_win(self):
@@ -321,7 +329,7 @@ class TelaRobo(object):
         if executar:
             ultima_linha += [sg.Column([
                 [sg.OK('Executar Robô', key='executar', font=self.font_bt_padrao, tooltip=ajuda)]],
-                pad=(145, 0))]
+                pad=(self.left_ult_linha, 0))]
         return ultima_linha
 
     def configura_informacoes_tarefa(self, nome_robo):
@@ -377,7 +385,7 @@ class TelaRobo(object):
         self.robo_ativo = ultimo_robo
         window = sg.Window(self.titulo,
                            self.layout,
-                           size=(967, 500),
+                           size=self.size_win,
                            font='sfprodisplay 11',
                            margins=(5, 5),
                            auto_size_text=True,
