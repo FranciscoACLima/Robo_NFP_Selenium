@@ -1,7 +1,10 @@
 """Módulo para carregamento da tela
 """
 import os
+import sys
+import subprocess
 import time
+import platform
 import PySimpleGUI as sg
 from nfp.servicos.arquivos import abrir_json, adicionar_dados_json, criar_json_dados_robos
 from nfp.robos.controlador_robos import ControladorRobos
@@ -12,17 +15,24 @@ import importlib as il
 class TelaRobo(object):
 
     JSON_CFG = 'config_window.json'
-    font_titulo = 'sfprodisplay 11 bold'
-    font_titulo_robo = 'sfprodisplay 23 bold'
-    font_label = 'sfprodisplay 10'
-    font_input = 'sfprodisplay 10'
-    font_texto = 'sfprodisplay 10'
-    font_bt_padrao = 'sfprodisplay 11'
-    font_bt_menor = 'sfprodisplay 9'
+    font_titulo = 'sfprodisplay 9 bold'
+    font_titulo_robo = 'sfprodisplay 22 bold'
+    font_label = 'sfprodisplay 9'
+    font_input = 'sfprodisplay 9'
+    font_texto = 'sfprodisplay 9'
+    font_bt_padrao = 'sfprodisplay 10'
+    font_bt_menor = 'sfprodisplay 8'
 
     def __init__(self):
         self.titulo = 'Robôs Nota Fiscal Paulista'
         sg.ChangeLookAndFeel('GreenTan')
+        self.size_win = (967, 500)
+        self.left_ult_linha = 145
+        if platform.system() == 'Linux':
+            self.size_win = (952, 500)
+            self.font_titulo_robo = 'sfprodisplay 21 bold'
+            self.font_input = 'sfprodisplay 8'
+            self.left_ult_linha = 140
 
     @property
     def cfg_win(self):
@@ -321,7 +331,7 @@ class TelaRobo(object):
         if executar:
             ultima_linha += [sg.Column([
                 [sg.OK('Executar Robô', key='executar', font=self.font_bt_padrao, tooltip=ajuda)]],
-                pad=(145, 0))]
+                pad=(self.left_ult_linha, 0))]
         return ultima_linha
 
     def configura_informacoes_tarefa(self, nome_robo):
@@ -377,7 +387,7 @@ class TelaRobo(object):
         self.robo_ativo = ultimo_robo
         window = sg.Window(self.titulo,
                            self.layout,
-                           size=(967, 500),
+                           size=self.size_win,
                            font='sfprodisplay 11',
                            margins=(5, 5),
                            auto_size_text=True,
@@ -416,7 +426,7 @@ class TelaRobo(object):
                 if 'criada com sucesso' in retorno[0].lower():
                     msg += '\nAguarde... Abrindo a planilha.'
                     try:
-                        os.startfile(retorno[1])
+                        self.abrir_planilha(retorno[1])
                     except Exception:
                         pass
                 sg.PopupAutoClose(msg, auto_close_duration=5)
@@ -435,6 +445,13 @@ class TelaRobo(object):
                 continue
             self.seleciona_robos(window, event)
             event, values = window.Read()
+
+    def abrir_planilha(self, filename):
+        if sys.platform == "win32":
+            os.startfile(filename)
+        else:
+            opener = "open" if sys.platform == "darwin" else "xdg-open"
+            subprocess.call([opener, filename])
 
     def extrair_resultados(self, values):
         self.reiniciar_tela = False
