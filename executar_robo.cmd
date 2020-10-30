@@ -2,8 +2,6 @@
 SETLOCAL ENABLEEXTENSIONS
 
 set DIR=%~dp0
-set DIR_PAI=%DIR:config_robos\=%
-echo +++ %DIR_PAI%
 echo +++ %DIR%
 
 set PYHTON=%DIR%venv\Scripts\python

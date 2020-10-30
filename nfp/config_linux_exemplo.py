@@ -1,6 +1,7 @@
 """ Configurações """
 import os
 import logging
+from pathlib import Path
 
 DEBUG = False
 
@@ -12,10 +13,10 @@ CHRDRIVER = os.path.join(BASEDIR, 'binaries', 'chromedriver')
 
 CHREXEC = "google-chrome"
 
-CHRPREFS = r"/home/gil-2004/Aplicacoes/Robo_NFP_Selenium/prefs_chrome"
+CHRPREFS = os.path.join(BASEDIR, "prefs_chrome")
 
 URI = os.path.join(BASEDIR, 'controle_execucao.db')
 
 logging.info('CHRDRIVER: {}'.format(CHRDRIVER))
 
-DIR_RESULT = os.path.join(BASEDIR, 'resultados')
+DIR_RESULT = os.path.join(Path.home(), 'resultados_nfp')
