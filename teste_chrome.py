@@ -2,7 +2,7 @@
 """teste para abertua do navegador"""
 from subprocess import Popen, PIPE
 from nfp.servicos.interface import abrir_popup
-from nfp.config import CHREXEC, CHRPREFS, URLBASE
+from nfp import CHREXEC, CHRPREFS, URLBASE
 
 
 def abrir_chrome():
