@@ -1,6 +1,8 @@
 """Módulo para carregamento da tela
 """
 import os
+import sys
+import subprocess
 import time
 import platform
 import PySimpleGUI as sg
@@ -445,11 +447,10 @@ class TelaRobo(object):
             event, values = window.Read()
 
     def abrir_planilha(self, filename):
-        import os, sys, subprocess
         if sys.platform == "win32":
             os.startfile(filename)
         else:
-            opener ="open" if sys.platform == "darwin" else "xdg-open"
+            opener = "open" if sys.platform == "darwin" else "xdg-open"
             subprocess.call([opener, filename])
 
     def extrair_resultados(self, values):
