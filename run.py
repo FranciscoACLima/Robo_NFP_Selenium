@@ -1,11 +1,15 @@
 """ Módulo de entrada da aplicação
 """
-from nfp.tela_robo import TelaRobo
 
 
 def main():
-    robo = TelaRobo()
-    robo.main()
+    try:
+        from nfp.tela_robo import TelaRobo
+        robo = TelaRobo()
+        robo.main()
+    except Exception as e:
+        print('Houve um erro ao executar a aplicação')
+        print(str(e))
 
 
 # --------------------------------------

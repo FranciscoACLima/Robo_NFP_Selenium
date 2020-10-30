@@ -62,6 +62,7 @@ class ControladorRobos():
             extrair_resultados(self.codigo_robo, retorno, dir_saida)
             return
         except Exception as e:
+            print(e)
             return " Erro. {} \n Execução cancelada.".format(e)
 
     def extrair_dados_planilhas(self, arquivo):
