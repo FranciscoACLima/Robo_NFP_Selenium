@@ -1,6 +1,7 @@
 """ Módulo para controle das telas do sistema Nota Fiscal Paulista
 
 """
+import sys
 import time
 import logging
 from subprocess import Popen, PIPE
@@ -8,7 +9,7 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-from nfp.config import CHRDRIVER, CHREXEC, CHRPREFS, URLBASE
+from nfp import CHRDRIVER, CHREXEC, CHRPREFS, URLBASE
 from nfp.servicos.interface import abrir_popup
 
 
@@ -41,12 +42,12 @@ class Nfp():
     def _abrir_chrome(self):
         chrexec = [
             CHREXEC,
-            '--disable-gpu',
-            '--disable-software-rasterizer',
             '--remote-debugging-port=9222',
             '--user-data-dir="{}"'.format(CHRPREFS),
             URLBASE
         ]
+        if sys.platform == "win32":
+            chrexec = '"{}" --remote-debugging-port=9222 --user-data-dir="{}" {}'.format(CHREXEC, CHRPREFS, URLBASE)
         Popen(chrexec, shell=False, stdout=PIPE).stdout
         msg = 'ROBÔ EM ESPERA\n\nFaça o login no sistema e responda ao captcha.\n'
         msg += 'Após o login, feche esta janela para iniciar a execução.\n'

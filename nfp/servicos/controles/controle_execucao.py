@@ -3,7 +3,7 @@ from datetime import datetime
 import sqlalchemy as db
 from sqlalchemy.orm import sessionmaker
 import nfp.servicos.model as tables
-from nfp.config import DEBUG, URI
+from nfp import DEBUG, URI
 
 
 class ControleExecucao(object):

@@ -8,7 +8,7 @@ import platform
 import PySimpleGUI as sg
 from nfp.servicos.arquivos import abrir_json, adicionar_dados_json, criar_json_dados_robos
 from nfp.robos.controlador_robos import ControladorRobos
-from nfp.config import BASEDIR, DIR_RESULT
+from nfp import BASEDIR, DIR_RESULT
 import importlib as il
 
 
