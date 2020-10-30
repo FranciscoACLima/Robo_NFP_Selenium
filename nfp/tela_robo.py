@@ -424,7 +424,7 @@ class TelaRobo(object):
                 if 'criada com sucesso' in retorno[0].lower():
                     msg += '\nAguarde... Abrindo a planilha.'
                     try:
-                        os.startfile(retorno[1])
+                        self.abrir_planilha(retorno[1])
                     except Exception:
                         pass
                 sg.PopupAutoClose(msg, auto_close_duration=5)
@@ -443,6 +443,14 @@ class TelaRobo(object):
                 continue
             self.seleciona_robos(window, event)
             event, values = window.Read()
+
+    def abrir_planilha(self, filename):
+        import os, sys, subprocess
+        if sys.platform == "win32":
+            os.startfile(filename)
+        else:
+            opener ="open" if sys.platform == "darwin" else "xdg-open"
+            subprocess.call([opener, filename])
 
     def extrair_resultados(self, values):
         self.reiniciar_tela = False
