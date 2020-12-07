@@ -72,6 +72,19 @@ class Nfp():
         tentativa += 1
         logging.info('Configurando cadastro entidade, mês e ano')
         try:
+            self.driver.implicitly_wait(5)
+            erro = self.driver.find_element_by_xpath('//*[@id="tf_body"]/table/tbody/tr[3]/td/p[3]')
+            logging.warning('Erro na abertura da tela:')
+            logging.warning(erro.text)
+            time.sleep(60)
+            if tentativa < 10:
+                return self.configurar_cadastro(tentativa)
+        except Exception as e:
+            if tentativa >= 10:
+                raise e
+        finally:
+            self.driver.implicitly_wait(self.implicitly_wait)
+        try:
             elem = self.driver.find_element_by_id('ctl00_ConteudoPagina_btnOk')
             elem.click()
             time.sleep(1)
