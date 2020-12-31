@@ -47,7 +47,6 @@ Os scripts estão configurados para utilizar o ambiente virtual `venv`
 O Selenium automatiza o navegador Google Chrome a partir do executável chromedriver (https://chromedriver.chromium.org/downloads).
 
 A aplicação verifica a versão do Navegador Chrome instalado com a versão do chromedriver presente no diretório `nfp/binaries`.
-
 Havendo diferença entre eles, **abre um popup informando as versões encontradas** e fecha a aplicação.
 
 Substitua o executável em `nfp/binaries` pelo correspondente à versão do Chrome instalado.
