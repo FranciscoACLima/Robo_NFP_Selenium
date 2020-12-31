@@ -19,5 +19,10 @@ def abrir_chrome():
     abrir_popup(msg)
 
 
+def test_get_versao():
+    from nfp.servicos.chrome import conferir_chrome
+    print(conferir_chrome())
+
+
 if __name__ == "__main__":
-    abrir_chrome()
+    test_get_versao()

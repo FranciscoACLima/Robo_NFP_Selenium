@@ -57,7 +57,7 @@ class CadastraNFP():
         logging.info(str(ex) + ' - ' + log)
         if EXIBIR_POPUP_RESULT:
             texto = ' {} de {} notas carregadas'.format(ex, tot)
-            abrir_popup(texto, 4)
+            abrir_popup(texto, 2)
 
 
 if __name__ == "__main__":
