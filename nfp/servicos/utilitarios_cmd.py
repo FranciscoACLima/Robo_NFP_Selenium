@@ -3,7 +3,7 @@ import time
 import os
 
 
-def executar_comando(command, *args, shell=False, debug=False):
+def executar_comando(command, *args, debug=False):
     try:
         sp = subprocess.Popen([command, *args], close_fds=True, **_subprocess_args())
         res, err = sp.communicate()
@@ -12,6 +12,19 @@ def executar_comando(command, *args, shell=False, debug=False):
             return res, err
     except Exception as e:
         print('Erro ao executar comando {}'.format(command))
+        raise e
+
+
+def executar_comando_com_retorno(command, args=[], linhas_finais=1):
+    try:
+        cmd = command + ' ' + ' '.join(args)
+        saida = subprocess.check_output(cmd, **_subprocess_args(False)).strip()
+        saida = str(saida)
+        saidas = saida.split('\n')
+        saida = saidas[-linhas_finais]
+        return saida
+    except Exception as e:
+        print('Erro ao executar comando {}'.format(cmd))
         raise e
 
 
