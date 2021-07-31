@@ -135,3 +135,6 @@ nfp/resultados
 nfp/config_window.json
 config.py
 logo_nfp.jpg
+nfp/binaries/chromedriver_win32.zip
+nfp/binaries/chromedriver.exe
+nfp/binaries/chromedriver

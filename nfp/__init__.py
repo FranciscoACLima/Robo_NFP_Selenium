@@ -3,6 +3,7 @@ import sys
 import logging
 import locale
 from pathlib import Path
+from nfp.servicos.conexao_bd import conecta_bd
 
 locale.setlocale(locale.LC_ALL, 'pt_BR.utf8')
 
@@ -49,3 +50,5 @@ DIR_RESULT = os.path.join(Path.home(), 'resultados_nfp')
 if not os.path.isdir(DIR_RESULT):
     os.mkdir(DIR_RESULT)
 logging.info('DIR_RESULT: {}'.format(DIR_RESULT))
+
+CONEXAO = conecta_bd(URI, DEBUG)
