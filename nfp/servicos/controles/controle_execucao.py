@@ -1,30 +1,28 @@
 import os
 from datetime import datetime
-import sqlalchemy as db
 from sqlalchemy.orm import sessionmaker
 import nfp.servicos.model as tables
-from nfp import DEBUG, URI
+from nfp import CONEXAO
 
 
 class ControleExecucao(object):
 
-    uri = URI
+    uri = ''
     tarefa = None
     tarefa_nova = False
+    engine = CONEXAO
 
     def configurar_base_de_dados(self):
-        SQLALCHEMY_DATABASE_URI = 'sqlite:///' + self.uri
-        engine = db.create_engine(SQLALCHEMY_DATABASE_URI, echo=DEBUG)
-        self.DBSession = sessionmaker(bind=engine)
+        self.DBSession = sessionmaker(bind=self.engine)
         if os.path.isfile(self.uri):
-            if not engine.dialect.has_table(engine, self.table_name):
+            if not self.engine.dialect.has_table(self.engine, self.table_name):
                 print('Tabela {} ainda não existe. Criando tabela...'.format(self.table_name))
                 base = tables.Base
-                base.metadata.create_all(engine)
+                base.metadata.create_all(self.engine)
             return
         print('Base de dados ainda não existe. Criando...')
         base = tables.Base
-        base.metadata.create_all(engine)
+        base.metadata.create_all(self.engine)
         print('usando base de dados: ' + self.uri)
 
     def get_tarefa(self, tarefa_id):
@@ -213,7 +211,6 @@ class ControleExecucao(object):
 # ---------------- Funções de módulo ------
 def selecionar_ultima_tarefa_remota_finalizada(tarefa_remota_id):
     ctrl = ControleExecucao()
-    ctrl.uri = URI
     ctrl.table_name = 'tarefas'
     ctrl.configurar_base_de_dados()
     return ctrl.selecionar_ultima_tarefa_remota_finalizada(tarefa_remota_id)
@@ -221,7 +218,6 @@ def selecionar_ultima_tarefa_remota_finalizada(tarefa_remota_id):
 
 def get_id_tarefa_remota(tarefa_id):
     ctrl = ControleExecucao()
-    ctrl.uri = URI
     ctrl.table_name = 'tarefas'
     ctrl.configurar_base_de_dados()
     return ctrl.get_id_tarefa_remota(tarefa_id)
@@ -229,7 +225,6 @@ def get_id_tarefa_remota(tarefa_id):
 
 def get_tarefa(tarefa_id):
     ctrl = ControleExecucao()
-    ctrl.uri = URI
     ctrl.table_name = 'tarefas'
     ctrl.configurar_base_de_dados()
     return ctrl.get_tarefa(tarefa_id)
@@ -237,7 +232,6 @@ def get_tarefa(tarefa_id):
 
 def reativar_tarefa(tarefa_id):
     ctrl = ControleExecucao()
-    ctrl.uri = URI
     ctrl.table_name = 'tarefas'
     ctrl.configurar_base_de_dados()
     return ctrl.reativar_tarefa(tarefa_id)
