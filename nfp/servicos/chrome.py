@@ -1,6 +1,7 @@
 """Funcionalidades para verificação da lidar com as versoes do chrome-driver"""
 import logging
 import os
+import stat
 import sys
 from shutil import rmtree
 from urllib import request
@@ -104,6 +105,8 @@ def baixar_chromedriver(versao):
     arq_zip = baixar_arquivo(arquivo, url, destino)
     print(arq_zip)
     descompactar(arq_zip, destino)
+    if platform != 'win32':
+        os.chmod(CHRDRIVER, 0o755)
 
 
 # ----------------------------------------------
