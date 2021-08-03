@@ -1,11 +1,12 @@
 """Funcionalidades para verificação da lidar com as versoes do chrome-driver"""
 import logging
+import os
 import sys
-from urllib import request
 from shutil import rmtree
+from urllib import request
 
 import requests
-from nfp import CHRDRIVER, CHREXEC, BASEDIR
+from nfp import BASEDIR, CHRDRIVER, CHREXEC
 from nfp.servicos.utilitarios_cmd import (executar_comando,
                                           executar_comando_com_retorno)
 

@@ -9,6 +9,7 @@ def main():
     if not(res):
         msg = 'A versão do chromedriver({}) é diferente da versão do navegador({})'.format(v_driver, v_chrome)
         msg += '\nBaixe uma nova versão em https://chromedriver.chromium.org/downloads'
+        msg += '\nO arquivo deve ser descompactado em nfp\binaries'
         abrir_popup(msg)
         return
     try:
