@@ -1,5 +1,5 @@
 """Funcionalidades para verificação da lidar com as versoes do chrome-driver"""
-import os
+import logging
 import sys
 from urllib import request
 from shutil import rmtree
@@ -53,16 +53,20 @@ def get_versao_chrome():
 
 
 def get_versao_chromedriver():
-    cmd = CHRDRIVER
-    args = ['--version']
-    marca = 'ChromeDriver '
-    res, err = executar_comando(cmd, *args, debug=True)
-    if err:
-        raise Exception('Erro ao capturar a versao do Chromedriver: {}'.format(err))
-    res = res.decode('ascii')
-    pos_i = res.find(marca)
-    pos_f = res.find('.')
-    return int(res[pos_i + len(marca): pos_f])
+    try:
+        cmd = CHRDRIVER
+        args = ['--version']
+        marca = 'ChromeDriver '
+        res, err = executar_comando(cmd, *args, debug=True)
+        if err:
+            raise Exception('Erro ao capturar a versao do Chromedriver: {}'.format(err))
+        res = res.decode('ascii')
+        pos_i = res.find(marca)
+        pos_f = res.find('.')
+        return int(res[pos_i + len(marca): pos_f])
+    except Exception as e:
+        logging.warning(f'Chrome driver nao encontrado {e}')
+        return ''
 
 
 def _get_versao_chrome_windows():
