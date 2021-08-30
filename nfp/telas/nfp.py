@@ -120,7 +120,7 @@ class Nfp():
         tentativa += 1
         try:
             elem = self.driver.find_element_by_xpath("//fieldset/div[4]/fieldset/input")
-            # elem.clear()
+            elem.clear()
             cod_nota = cod_nota.strip()
             logging.info(f'Codigo: {cod_nota} - tentativa: {tentativa}')
             elem.send_keys(cod_nota)
@@ -133,6 +133,8 @@ class Nfp():
                 return 'OK - NF gravada'
             if 'Este pedido já existe no sistema' in elem.text:
                 return 'NF ja existe'
+            if 'excedeu o prazo máximo para cadastro' in elem.text:
+                return 'NF fora do prazo'
             if tentativa < 4:
                 return self.gravar_nota(cod_nota, tentativa)
             return 'ERRO: erro ao gravar a NF'
