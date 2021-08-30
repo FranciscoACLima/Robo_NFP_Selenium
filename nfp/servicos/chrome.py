@@ -1,6 +1,7 @@
 """Funcionalidades para verificação da lidar com as versoes do chrome-driver"""
 import logging
 import os
+import stat
 import sys
 from shutil import rmtree
 from urllib import request
@@ -34,7 +35,8 @@ def conferir_chrome():
     try:
         baixar_chromedriver(v_chrome)
         return True, v_chrome, v_driver
-    except Exception:
+    except Exception as e:
+        logging.warning(e)
         return False, v_chrome, v_driver
 
 
@@ -98,11 +100,13 @@ def baixar_chromedriver(versao):
     destino = os.path.join(BASEDIR, 'binaries')
     if os.path.isdir(destino):
         rmtree(destino)
-        os.mkdir(destino)
+    os.mkdir(destino)
     url = f'https://chromedriver.storage.googleapis.com/{last_release}'
     arq_zip = baixar_arquivo(arquivo, url, destino)
     print(arq_zip)
     descompactar(arq_zip, destino)
+    if platform != 'win32':
+        os.chmod(CHRDRIVER, 0o755)
 
 
 # ----------------------------------------------
