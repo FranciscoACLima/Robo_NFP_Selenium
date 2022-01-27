@@ -2,29 +2,41 @@
 
 Robô de cadastro de Nota Fiscal Paulista para instituições sem fins lucrativos.
 
+## Preparação do código para criação do ambiente de desenvolvimento
+
+Crie um diretório para o projeto e dentro dele faça o clone do repositório
+`git clone https://github.com/FranciscoACLima/Robo_NFP_Selenium.git`
 
 ## Instalação do ambiente de desenvolvimento e execução
 
-`cd <diretorio>/Robo_NFP_Selenium`
+Antes de mais nada, instale o pacote virtualenv no Python
+`pip install virtualenv`
+ou 
+`pip3 install virtualenv`
 
-Para alterar as configurações padrão da aplicação, criar o arquivo `nfp/config.py` de acordo com o exemplo: `config_exemplo.py`
+Entre na pasta do repositório e crie um ambiente virtual chamado venv
+
+`cd <diretorio>/Robo_NFP_Selenium`
 
 Criar um ambiente virtual: 
 `virtualenv venv`
 
-Ativar o ambiente Windows: 
+Ative o ambiente virtual
+
+No Windows: 
 `venv/scripts/activate` 
 
-Ativar o ambiente Linux: 
+No Linux: 
 `source venv/bin/activate`
 
-Instalar as dependências: 
+Instale as dependências necessárias: 
 `pip install -r requirements.txt`
 
 Observações para instalação no Linux:
 
-Instalar o pacote `python3-tk` para que a interface gráfica funcione.
+Instale também o pacote `python3-tk` para que a interface gráfica funcione.
 
+Altere as configurações padrão da aplicação, criando o arquivo `nfp/config.py` de acordo com o exemplo: `config_exemplo.py`
 
 ### Execução em desenvolvimento
 
