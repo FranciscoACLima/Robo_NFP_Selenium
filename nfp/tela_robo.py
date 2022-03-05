@@ -8,7 +8,7 @@ import platform
 import PySimpleGUI as sg
 from nfp.servicos.arquivos import abrir_json, adicionar_dados_json, criar_json_dados_robos
 from nfp.robos.controlador_robos import ControladorRobos
-from nfp import BASEDIR, DIR_RESULT
+from nfp import BASEDIR, DIR_RESULT, INITIAL_FOLDER
 import importlib as il
 
 
@@ -136,13 +136,13 @@ class TelaRobo(object):
         """
         ajuda = 'Prepare a planilha de acordo com as\n'
         ajuda += 'informações contidas na coluna ao lado'
+        arq =self.get_cfg_win(prefixo + 'arquivo_entrada')
         return [
             sg.Text('Planilha de Entrada:', size=(15, 1), font=self.font_label),
-            sg.Input(self.get_cfg_win(prefixo + 'arquivo_entrada'),
-                     key=prefixo + 'arquivo_entrada', size=(47, 1),
+            sg.Input(arq, key=prefixo + 'arquivo_entrada', size=(47, 1),
                      font=self.font_input,
                      tooltip=ajuda),
-            sg.FileBrowse('Buscar', font=self.font_bt_menor)
+            sg.FileBrowse('Buscar', font=self.font_bt_menor, initial_folder=INITIAL_FOLDER)
         ]
 
     def sel_mes(self, prefixo):
