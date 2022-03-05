@@ -11,9 +11,10 @@ class ControleExecucao(object):
     tarefa = None
     tarefa_nova = False
     engine = CONEXAO
+    DBSession = sessionmaker(bind=engine)
 
     def configurar_base_de_dados(self):
-        self.DBSession = sessionmaker(bind=self.engine)
+        self.DBSession.expire_on_commit = False
         if os.path.isfile(self.uri):
             if not self.engine.dialect.has_table(self.engine, self.table_name):
                 print('Tabela {} ainda não existe. Criando tabela...'.format(self.table_name))
@@ -203,9 +204,6 @@ class ControleExecucao(object):
             tarefa.robo == robo,
         ).order_by(tarefa.fim.desc())
         return query.first()
-
-    def __del__(self):
-        del self.DBSession
 
 
 # ---------------- Funções de módulo ------

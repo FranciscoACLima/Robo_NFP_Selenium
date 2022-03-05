@@ -3,43 +3,42 @@ import sys
 import logging
 import locale
 from pathlib import Path
+from nfp.servicos.arquivos import abrir_json
+from nfp.servicos.chrome import get_chrome_path
 from nfp.servicos.conexao_bd import conecta_bd
 
 locale.setlocale(locale.LC_ALL, 'pt_BR.utf8')
 
 logging.basicConfig(level='INFO')
 
-try:
-    from nfp.config import INITIAL_FOLDER
-    INITIAL_FOLDER = INITIAL_FOLDER
-except Exception:
-    INITIAL_FOLDER = ''
-
-try:
-    from nfp.config import DEBUG
-    DEBUG = DEBUG
-except Exception:
-    DEBUG = False
-
-try:
-    from nfp.config import EXIBIR_POPUP_RESULT
-    EXIBIR_POPUP_RESULT = EXIBIR_POPUP_RESULT
-except Exception:
-    EXIBIR_POPUP_RESULT = True
-
-try:
-    from nfp.config import CHREXEC
-    CHREXEC = CHREXEC
-except Exception:
-    if sys.platform == "win32":
-        CHREXEC = r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"
-    else:
-        CHREXEC = "google-chrome"
-
-URLBASE = r'https://www.nfp.fazenda.sp.gov.br/EntidadesFilantropicas/CadastroNotaEntidadeAviso.aspx'
+VERSAO = '0.0.4 - ALPHA'
 
 BASEDIR = os.path.dirname(__file__)
+CONFIG_FILE = "config_maquina.json"
 
+URLBASE = r'https://www.nfp.fazenda.sp.gov.br/EntidadesFilantropicas/CadastroNotaEntidadeAviso.aspx'
+INITIAL_FOLDER = ''
+DEBUG = False
+EXIBIR_POPUP_RESULT = False
+CHREXEC = "google-chrome"
+if sys.platform == "win32":
+    CHREXEC = get_chrome_path()
+
+config_maq = abrir_json(os.path.join(BASEDIR, CONFIG_FILE))
+
+if config_maq:
+    try:
+        INITIAL_FOLDER = config_maq['dir_planilhas']
+
+        if config_maq['debug_db'] == 'Sim':
+            DEBUG = True
+        if config_maq['popup_resultados'] == 'Sim':
+            EXIBIR_POPUP_RESULT = True
+        CHREXEC = config_maq['path_chrome']
+        URLBASE = config_maq['url_base']
+    except:
+        pass
+       
 URI = os.path.join(BASEDIR, 'controle_execucao.db')
 
 CHRDRIVER = os.path.join(BASEDIR, 'binaries', 'chromedriver')

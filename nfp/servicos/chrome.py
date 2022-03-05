@@ -1,13 +1,12 @@
 """Funcionalidades para verificação da lidar com as versoes do chrome-driver"""
 import logging
 import os
-import stat
+import subprocess
 import sys
 from shutil import rmtree
 from urllib import request
 
 import requests
-from nfp import BASEDIR, CHRDRIVER, CHREXEC
 from nfp.servicos.utilitarios_cmd import (executar_comando,
                                           executar_comando_com_retorno)
 
@@ -32,6 +31,8 @@ def conferir_chrome():
     v_driver = get_versao_chromedriver()
     if v_chrome == v_driver:
         return True, v_chrome, v_driver
+    if not v_chrome:
+        return False, v_chrome, v_driver
     try:
         baixar_chromedriver(v_chrome)
         return True, v_chrome, v_driver
@@ -41,6 +42,7 @@ def conferir_chrome():
 
 
 def get_versao_chrome():
+    from nfp import CHREXEC
     if sys.platform == "win32":
         return _get_versao_chrome_windows()
     cmd = CHREXEC
@@ -56,6 +58,7 @@ def get_versao_chrome():
 
 
 def get_versao_chromedriver():
+    from nfp import CHRDRIVER
     try:
         cmd = CHRDRIVER
         args = ['--version']
@@ -73,6 +76,7 @@ def get_versao_chromedriver():
 
 
 def _get_versao_chrome_windows():
+    from nfp import CHREXEC
     exec_chrome = CHREXEC.replace('/', '\\').replace('\\', '\\\\')
     cmd = r'wmic datafile where name="{}" get Version /value'.format(exec_chrome)
     result = executar_comando_com_retorno(cmd)
@@ -84,6 +88,7 @@ def _get_versao_chrome_windows():
 
 
 def baixar_chromedriver(versao):
+    from nfp import BASEDIR, CHRDRIVER
     sistema = 'linux64'
     platform = sys.platform
     if platform == 'win32':
@@ -107,6 +112,20 @@ def baixar_chromedriver(versao):
     descompactar(arq_zip, destino)
     if platform != 'win32':
         os.chmod(CHRDRIVER, 0o755)
+
+
+def get_chrome_path():
+    saida = subprocess.check_output(["powershell.exe",
+                                    "(Get-Item (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe')\
+.'(Default)')"]).strip()
+    saida = str(saida, encoding='cp437')
+    pos_i = saida.find('Diretório:') + 10
+    if pos_i == -1:
+        return -1
+    pos_f = saida[pos_i:].find('\n')
+    path = saida[pos_i: pos_i + pos_f].strip()
+    path += '\\chrome.exe'
+    return path
 
 
 # ----------------------------------------------

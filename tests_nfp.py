@@ -1,4 +1,4 @@
-from nfp.telas.nfp import Nfp
+from nfp.robos.chrome_telas.nfp import Nfp
 from nfp.servicos.arquivos import extrair_dados_planilhas, inserir_linha_arq_csv
 
 

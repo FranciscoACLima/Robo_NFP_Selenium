@@ -1,27 +1,26 @@
 """Módulo para carregamento da tela
 """
-import os
-import sys
-import subprocess
-import time
-import platform
-import PySimpleGUI as sg
-from nfp.servicos.arquivos import abrir_json, adicionar_dados_json, criar_json_dados_robos
-from nfp.robos.controlador_robos import ControladorRobos
-from nfp import BASEDIR, DIR_RESULT, INITIAL_FOLDER
 import importlib as il
+import os
+import platform
+import subprocess
+import sys
+import time
+
+import PySimpleGUI as sg
+
+import nfp.tela_config as cfg
+import nfp.tela_sobre as sbr
+from nfp import BASEDIR, DIR_RESULT, INITIAL_FOLDER
+from nfp.robos.controlador_robos import ControladorRobos
+from nfp.servicos.arquivos import (abrir_json, adicionar_dados_json,
+                                   criar_json_dados_robos)
+from nfp.tela_root import TelaRoot
 
 
-class TelaRobo(object):
+class TelaRobo(TelaRoot):
 
     JSON_CFG = 'config_window.json'
-    font_titulo = 'sfprodisplay 9 bold'
-    font_titulo_robo = 'sfprodisplay 22 bold'
-    font_label = 'sfprodisplay 9'
-    font_input = 'sfprodisplay 9'
-    font_texto = 'sfprodisplay 9'
-    font_bt_padrao = 'sfprodisplay 10'
-    font_bt_menor = 'sfprodisplay 8'
 
     def __init__(self):
         self.titulo = 'Robôs Nota Fiscal Paulista'
@@ -436,11 +435,11 @@ class TelaRobo(object):
                 event, values = window.Read()
                 continue
             if '::sobre' in event:
-                # sobre.run()
+                sbr.run()
                 event, values = window.Read()
                 continue
             if '::config_maquina' in event:
-                # config_maquina.run()
+                cfg.run()
                 event, values = window.Read()
                 continue
             self.seleciona_robos(window, event)
