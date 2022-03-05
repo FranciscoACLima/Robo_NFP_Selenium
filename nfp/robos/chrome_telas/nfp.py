@@ -1,4 +1,4 @@
-""" Módulo para controle das telas do sistema Nota Fiscal Paulista
+""" Módulo para controle das chrome do sistema Nota Fiscal Paulista
 
 """
 import sys

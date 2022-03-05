@@ -2,7 +2,7 @@ import logging
 from nfp.servicos.controles.notas_fiscais import (selecionar_execucao, finalizar_execucao,
                                                   contar_processos_executados, selecionar_tarefa_ativa)
 from nfp.servicos.interface import abrir_popup
-from nfp.telas.nfp import Nfp
+from nfp.robos.chrome_telas.nfp import Nfp
 from nfp import EXIBIR_POPUP_RESULT
 
 
@@ -55,6 +55,7 @@ class CadastraNFP():
         finalizar_execucao(self.id, resultado)
         ex, tot = contar_processos_executados(self.tarefa_id)
         logging.info(str(ex) + ' - ' + log)
+        logging.info(f'** {ex} de {tot} - {log} **')
         if EXIBIR_POPUP_RESULT:
             texto = ' {} de {} notas carregadas'.format(ex, tot)
             abrir_popup(texto, 2)
