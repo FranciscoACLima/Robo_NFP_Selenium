@@ -2,14 +2,17 @@
 
 Robô de cadastro de Nota Fiscal Paulista para instituições sem fins lucrativos.
 
+Na execução, o robô aguarda que o usuário faça o login e responda ao captcha antes de iniciar o cadastro das notas.
+
 ## Preparação do código para criação do ambiente de desenvolvimento
 
 Crie um diretório para o projeto e dentro dele faça o clone do repositório
 `git clone https://github.com/FranciscoACLima/Robo_NFP_Selenium.git`
 
-## Instalação do ambiente de desenvolvimento e execução
+## Instalação do ambiente de desenvolvimento com virtualenv
 
-Antes de mais nada, instale o pacote virtualenv no Python
+O projeto está preparado para utilizar o [virtualenv](https://virtualenv.pypa.io/en/latest/) para desenvolvimento e execução da aplicação
+Instale o pacote virtualenv no Python
 `pip install virtualenv`
 ou 
 `pip3 install virtualenv`
@@ -54,11 +57,10 @@ Linux:
 Os scripts estão configurados para utilizar o ambiente virtual `venv`
 
 
-## Aviso de atualização do chromedriver:
+## Atualização do chromedriver:
 
-O Selenium automatiza o navegador Google Chrome a partir do executável chromedriver (https://chromedriver.chromium.org/downloads).
+O robô utiliza a biblioteca [Selenium](https://www.selenium.dev/) para automatizar o navegador **Google Chrome** através do executável [chromedriver](https://chromedriver.chromium.org/downloads).
 
-A aplicação verifica a versão do Navegador Chrome instalado com a versão do chromedriver presente no diretório `nfp/binaries`.
-Havendo diferença entre eles, **abre um popup informando as versões encontradas** e fecha a aplicação.
+A partir da versão 0.0.3, aplicação verifica a versão do navegador **Chrome** instalado e faz o donwload da versão do **crhomedriver** correspondente de forma automática.
 
-Substitua o executável em `nfp/binaries` pelo correspondente à versão do Chrome instalado.
+
