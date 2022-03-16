@@ -1,5 +1,6 @@
 import json
 import os
+import platform
 
 import PySimpleGUI as sg
 
@@ -13,11 +14,15 @@ from nfp.tela_root import TelaRoot
 class TelaConfig(TelaRoot):
 
     def __init__(self):
+        import socket
+        hostname = socket.gethostname()
         self.DIR_CFG = BASEDIR
         self.arquivo_config = CONFIG_FILE
         sg.ChangeLookAndFeel('GreenTan')
         self.size_win = (770, 260)  # (570, 360)
-        self.titulo = f"Configuração da Aplicação Nota Fiscal Paulista - computador: {os.environ['COMPUTERNAME']}"
+        if platform.system() == 'Linux':
+            self.size_win = (850, 280)
+        self.titulo = f"Configuração da Aplicação Nota Fiscal Paulista - computador: {hostname}"
         self.size_label = 20
         self.size_cmp = 75
         self.largura = 95
@@ -126,7 +131,7 @@ class TelaConfig(TelaRoot):
                      font=self.font_input),
             sg.FolderBrowse('Buscar', font=self.font_bt_menor)
         ]
-    
+
     def main(self):
         # dir_base = os.path.dirname(__file__)
         # icone = os.path.join(dir_base, 'tela', 'resources',
@@ -161,7 +166,7 @@ class TelaConfig(TelaRoot):
             config_maquina = {
                 "path_chrome": CHREXEC,
                 "dir_saida": DIR_RESULT,
-                "debug_db": DEBUG, 
+                "debug_db": DEBUG,
                 "popup_resultados": EXIBIR_POPUP_RESULT,
                 "dir_planilhas": INITIAL_FOLDER,
                 "url_base": URLBASE,

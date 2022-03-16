@@ -123,10 +123,11 @@ class Nfp():
             elem.clear()
             cod_nota = cod_nota.strip()
             logging.info(f'Codigo: {cod_nota} - tentativa: {tentativa}')
+            elem.send_keys(Keys.HOME)
             elem.send_keys(cod_nota)
             time.sleep(1)
             elem.send_keys(Keys.ENTER)
-            time.sleep(3)
+            time.sleep(2)
             elem = self.driver.find_element_by_xpath('//*[@id="ConteudoPrincipal"]/div[2]/div[1]')
             logging.info(elem.text)
             if 'Doação registrada com sucesso' in elem.text:
