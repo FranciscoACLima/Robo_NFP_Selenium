@@ -3,7 +3,15 @@ from cx_Freeze import setup, Executable
 
 DIR_BASE = os.path.dirname(__file__)
 
-# Dependencies are automatically detected, but it might need fine tuning.
+local_files = [
+    os.path.join(DIR_BASE, "nfp", "controle_execucao.db"),
+    os.path.join(DIR_BASE, "nfp", "config_maquina.json"),
+    os.path.join(DIR_BASE, "nfp", "config_window.json")
+]
+for file in local_files:
+    if os.path.isfile(file):
+        os.unlink(file)
+
 build_exe_options = {
     "packages": [
         "sqlalchemy"
@@ -11,10 +19,12 @@ build_exe_options = {
     "includes": [],
     "include_files": [],
     "excludes": [
-        'nfp.prefs_chrome'
+        'nfp.prefs_chrome',
+        'nfp.binaries'
     ],
-    "bin_excludes": ['config.py'],
-    "optimize": 1
+    "bin_excludes": [],
+    "optimize": 1,
+    "build_exe": "build/RoboNFP"
 }
 
 base = None

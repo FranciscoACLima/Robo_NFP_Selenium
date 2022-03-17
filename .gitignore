@@ -140,3 +140,4 @@ nfp/binaries/chromedriver.exe
 nfp/binaries/chromedriver
 nfp/binaries/chromedriver_linux64.zip
 nfp/config_maquina.json
+.vscode/launch.json
