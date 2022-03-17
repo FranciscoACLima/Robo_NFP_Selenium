@@ -13,7 +13,7 @@ Crie um diretório para o projeto e dentro dele faça o clone do repositório
 
 https://github.com/FranciscoACLima/Robo_NFP_Selenium/releases/download/0.0.4/RoboNFP_WIN64.zip
 
-## Instalação do ambiente de desenvolvimento com virtualenv
+## Preparação do ambiente para execução no Python 3
 
 O projeto está preparado para utilizar o [virtualenv](https://virtualenv.pypa.io/en/latest/) para desenvolvimento e execução da aplicação
 Instale o pacote virtualenv no Python
@@ -56,9 +56,9 @@ Windows:
 `executar_robo.cmd`
 
 Linux: 
-`executar_robo.sh`
+`./executar_robo.sh`
 
-Os scripts estão configurados para utilizar o ambiente virtual `venv`
+Os scripts cmd e sh estão configurados para utilizar o ambiente virtual `venv`
 
 
 ## Atualização do chromedriver:
