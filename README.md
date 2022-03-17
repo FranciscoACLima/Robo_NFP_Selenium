@@ -9,6 +9,10 @@ Na execução, o robô aguarda que o usuário faça o login e responda ao captch
 Crie um diretório para o projeto e dentro dele faça o clone do repositório
 `git clone https://github.com/FranciscoACLima/Robo_NFP_Selenium.git`
 
+## Executável para Windows 64
+
+https://github.com/FranciscoACLima/Robo_NFP_Selenium/releases/download/0.0.4/RoboNFP_WIN64.zip
+
 ## Instalação do ambiente de desenvolvimento com virtualenv
 
 O projeto está preparado para utilizar o [virtualenv](https://virtualenv.pypa.io/en/latest/) para desenvolvimento e execução da aplicação
