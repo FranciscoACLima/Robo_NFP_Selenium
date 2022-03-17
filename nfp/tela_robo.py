@@ -382,7 +382,7 @@ class TelaRobo(TelaRoot):
     def main(self):
         ultimo_robo = self.get_cfg_win('robo_selecionado')
         if not ultimo_robo:
-            self.add_cfg_win('robo_selecionado', 'pagina_inicial')
+            self.add_cfg_win('robo_selecionado', 'notas_fiscais')
         self.robo_ativo = ultimo_robo
         window = sg.Window(self.titulo,
                            self.layout,
