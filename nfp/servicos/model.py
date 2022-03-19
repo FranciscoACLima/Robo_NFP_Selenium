@@ -5,6 +5,23 @@ from sqlalchemy.orm import relationship
 Base = declarative_base()
 
 
+class DividePlanilha(Base):
+    __tablename__ = 'divide_planilha'
+
+    id = Column(Integer, primary_key=True)
+    tarefa_id = Column(Integer, ForeignKey('tarefas.id'), nullable=False)
+    plan_entrada = Column(String)
+    inicio = Column(DateTime)
+    fim = Column(DateTime)
+    resultado = Column(String)
+    entrada_remota_id = Column(Integer)
+    resultado_enviado = Column(DateTime)
+    tarefa = relationship('Tarefa', foreign_keys=tarefa_id)
+
+    def __repr__(self):
+        return "<DividePlanilha()>"
+
+
 class NotaFiscal(Base):
     __tablename__ = 'notas_fiscais'
 

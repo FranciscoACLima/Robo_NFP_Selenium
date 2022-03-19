@@ -11,14 +11,14 @@ import PySimpleGUI as sg
 
 import nfp.tela_config as cfg
 import nfp.tela_sobre as sbr
-from nfp import BASEDIR, DIR_RESULT, INITIAL_FOLDER
+from nfp import BASEDIR, DIR_RESULT
 from nfp.robos.controlador_robos import ControladorRobos
 from nfp.servicos.arquivos import (abrir_json, adicionar_dados_json,
                                    criar_json_dados_robos)
 from nfp.tela_root import TelaRoot
+from nfp.sg_blocos import SgBlocos
 
-
-class TelaRobo(TelaRoot):
+class TelaRobo(SgBlocos, TelaRoot):
 
     JSON_CFG = 'config_window.json'
 
@@ -26,12 +26,19 @@ class TelaRobo(TelaRoot):
         self.titulo = 'Robôs Nota Fiscal Paulista'
         sg.ChangeLookAndFeel('GreenTan')
         self.size_win = (967, 500)
+        self.size_d = (558, 380)
         self.left_ult_linha = 145
+        self.tam_linha = 65
+        self.pad_titulo = (20, 5)
         if platform.system() == 'Linux':
-            self.size_win = (952, 500)
+            self.size_win = (962, 500)
+            self.size_d = (578, 380)
+            self.pad_titulo = (30, 5)
             self.font_titulo_robo = 'sfprodisplay 21 bold'
             self.font_input = 'sfprodisplay 8'
             self.left_ult_linha = 140
+            self.tam_linha = 80
+
 
     @property
     def cfg_win(self):
@@ -52,7 +59,7 @@ class TelaRobo(TelaRoot):
         """
         selecionado = self.get_cfg_win('robo_selecionado')
         linhas = []
-        linhas += [sg.Menu(self.menu, tearoff=True)]
+        linhas += [sg.Menu(self.menu, tearoff=False)]
         for robo in self.robos:
             visivel = False
             if robo['cod'] == selecionado:
@@ -77,12 +84,10 @@ class TelaRobo(TelaRoot):
     @property
     def robos(self):
         return [
-            {'cod': 'pagina_inicial',
-             'nome': 'Página Inicial'},
             {'cod': 'notas_fiscais',
              'nome': 'Grava Notas Fiscais'},
             {'cod': 'divide_planilha',
-             'nome': 'Divide uma Planilha em várias'}
+             'nome': 'Divide uma Planilha em Várias'}
         ]
 
     @property
@@ -111,10 +116,38 @@ class TelaRobo(TelaRoot):
             [sg.Text('Página Inicial')],
         ]
 
+    # COLUNAS ROBO DIVIDE PLANILHA
+    def col_esquerda_divide_planilha(self):
+        texto = 'Este robô divide a planilha informada em várias, utilizando como referência uma quantidade de linhas ou '
+        texto += 'uma quantidade de planilhas.'
+        texto1 = 'O arquivo de entrada é a planilha Excel que será dividida.'
+        texto1 += '\n\n\nApós a inclusão das informações, clique em "Executar Robô" e aguarde a finalização da execução.'
+        return [
+            [sg.Text('O que faz este robô:', font=self.font_titulo)],
+            [sg.Text(texto, size=(35, 6), font=self.font_texto)],
+            [sg.Text('Como executá-lo:', font=self.font_titulo)],
+            [sg.Text(texto1, size=(35, 8), font=self.font_texto)],
+        ]
+
+    def col_direita_divide_planilha(self, prefixo):
+        layout = []
+        tam = self.tam_linha
+        layout.append([sg.Text(' ' * tam)])
+        if not self.get_tarefa_ativa(prefixo):
+            layout.append(self.arquivo_entrada(prefixo))
+        layout.append(self.arquivo_saida(prefixo))
+        layout.append([sg.Text('_' * tam, (tam, 2))])
+        layout.append(self.divisao_planilha_criterio(prefixo))
+        layout.append(self.divisao_planilha_qtd(prefixo))
+        layout.append(self.contem_titulo(prefixo))
+        return layout
+    # --------------------------------------------
+
+    # COLUNAS ROBO NOTAS FISCAIS
     def col_esquerda_notas_fiscais(self):
         texto = 'Este robô grava Nota Fiscal Paulista  para instituições sem fins lucrativos.'
         texto += '\nQuando o robô é executado, uma nova janela do navegador Google Chrome é aberta'
-        texto += '\nna página de login da nota fiscal.'
+        texto += ' na página de login da nota fiscal.'
         texto1 = 'O arquivo de entrada é uma planilha Excel contendo 1 coluna:'
         texto1 += '\n  1. código da nota fiscal'
         texto1 += '\n\nApós a inclusão das informações, clique em "Executar Robô"'
@@ -128,71 +161,15 @@ class TelaRobo(TelaRoot):
             [sg.Text(texto2, size=(35, 2), font=self.font_titulo)],
         ]
 
-    def arquivo_entrada(self, prefixo):
-        """ Arquivo de entrada para os robôs
-
-            Retorna uma linha
-        """
-        ajuda = 'Prepare a planilha de acordo com as\n'
-        ajuda += 'informações contidas na coluna ao lado'
-        arq =self.get_cfg_win(prefixo + 'arquivo_entrada')
-        return [
-            sg.Text('Planilha de Entrada:', size=(15, 1), font=self.font_label),
-            sg.Input(arq, key=prefixo + 'arquivo_entrada', size=(47, 1),
-                     font=self.font_input,
-                     tooltip=ajuda),
-            sg.FileBrowse('Buscar', font=self.font_bt_menor, initial_folder=INITIAL_FOLDER)
-        ]
-
-    def sel_mes(self, prefixo):
-        meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho',
-                 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro']
-        valor = self.get_cfg_win(prefixo + 'mes')
-        if not valor:
-            valor = 'Janeiro'
-        return [
-            sg.Text('Mês de referência:', size=(15, 1), font=self.font_label),
-            sg.Combo(values=meses, key=prefixo + 'mes',
-                     size=(42, 1), default_value=valor,
-                     font=self.font_input, readonly=True)
-        ]
-
-    def sel_ano(self, prefixo):
-        import datetime
-        now = datetime.datetime.now()
-        ano_atual = now.year
-        ano_anterior = str(int(ano_atual - 1))
-        meses = [ano_anterior, ano_atual]
-        valor = self.get_cfg_win(prefixo + 'ano')
-        if not valor:
-            valor = ano_atual
-        return [
-            sg.Text('Ano de referência:', size=(15, 1), font=self.font_label),
-            sg.Combo(values=meses, key=prefixo + 'ano',
-                     size=(42, 1), default_value=valor,
-                     font=self.font_input, readonly=True)
-        ]
-
-    def sel_entidade(self, prefixo):
-        valor = self.get_cfg_win(prefixo + 'entidade')
-        if not valor:
-            valor = 'CREN - CENTRO DE RECUPERAÇÃO E EDUCAÇÃO NUTRICIONAL'
-        return [
-            sg.Text('Entidade:', size=(7, 1), font=self.font_label),
-            sg.Input(valor, key=prefixo + 'entidade', size=(64, 1),
-                     font=self.font_input)
-        ]
-
     def col_direita_notas_fiscais(self, prefixo):
         layout = []
-        tam = 66
+        tam = self.tam_linha
         layout.append([sg.Text(' ' * tam)])
         if not self.get_tarefa_ativa(prefixo):
             layout.append(self.arquivo_entrada(prefixo))
         layout.append(self.sel_mes(prefixo))
         layout.append(self.sel_ano(prefixo))
-        layout.append([sg.Text(' ' * tam)])
-        layout.append([sg.Text(' ' * tam)])
+        layout.append([sg.Text('_' * tam, (tam, 2))])
         layout.append(self.sel_entidade(prefixo))
         return layout
 
@@ -249,17 +226,17 @@ class TelaRobo(TelaRoot):
                 2. Direita -> Formulários
         """
         # define uma linha vertical entre as colunas com exceção à pagina inicial
-        separador_vertical = sg.VerticalSeparator(pad=None)
+        separador_vertical = sg.VerticalSeparator(color='black', pad=None)
         if robo['cod'] == 'pagina_inicial':
             separador_vertical = sg.Column([])
         if not size_e:
             size_e = (300, 380)
         if not size_d:
-            size_d = (558, 380)
+            size_d = self.size_d
         return [
             [sg.Text(
                 robo['nome'],
-                pad=(20, 5),
+                pad=self.pad_titulo,
                 justification='center',
                 font=self.font_titulo_robo,
                 relief=sg.RELIEF_RIDGE,
@@ -270,7 +247,7 @@ class TelaRobo(TelaRoot):
                 sg.Column(
                     col_e,
                     size=size_e,
-                    pad=(6, 0),
+                    pad=(10, 0),
                     scrollable=scroll,
                     vertical_scroll_only=scroll
                 ),
@@ -312,11 +289,17 @@ class TelaRobo(TelaRoot):
                 col_e=self.col_esquerda_notas_fiscais(),
                 col_d=self.col_direita_notas_fiscais(robo['cod']))
             layout.append(self.configura_ultima_linha_robo(robo['cod']))
+        if robo['cod'] == 'divide_planilha':
+            layout = self.configura_layout_coluna_robo(
+                robo=robo,
+                col_e=self.col_esquerda_divide_planilha(),
+                col_d=self.col_direita_divide_planilha(robo['cod']))
+            layout.append(self.configura_ultima_linha_robo(robo['cod']))
         return sg.Column(
             layout,
             visible=visivel,
             key=robo['cod'],
-            size=(970, 550),
+            size=self.size_win,
             pad=(0, 0),
         )
 
