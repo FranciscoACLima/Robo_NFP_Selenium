@@ -4,16 +4,23 @@ Robô de cadastro de Nota Fiscal Paulista para instituições sem fins lucrativo
 
 Na execução, o robô aguarda que o usuário faça o login e responda ao captcha antes de iniciar o cadastro das notas.
 
+O robô foi desenvolvido para ser executado no navegador ``Google Chrome`` 
+
+## Utilitário Divide Planilha
+
+Para auxiliar na distribuição da execução do robô em mais de um computador, foi incluído um utilitário para divisão de uma planilha no formato excel ou csv em várias.
+
+
+## Executável para Windows 64
+
+https://github.com/FranciscoACLima/Robo_NFP_Selenium/releases/download/0.1.0/RoboNFP_WIN64.zip
+
 ## Preparação do código para criação do ambiente de desenvolvimento
 
 Crie um diretório para o projeto e dentro dele faça o clone do repositório
 `git clone https://github.com/FranciscoACLima/Robo_NFP_Selenium.git`
 
-## Executável para Windows 64
-
-https://github.com/FranciscoACLima/Robo_NFP_Selenium/releases/download/0.0.4/RoboNFP_WIN64.zip
-
-## Preparação do ambiente para execução no Python 3
+### Preparação do ambiente para execução no Python 3
 
 O projeto está preparado para utilizar o [virtualenv](https://virtualenv.pypa.io/en/latest/) para desenvolvimento e execução da aplicação
 Instale o pacote virtualenv no Python
