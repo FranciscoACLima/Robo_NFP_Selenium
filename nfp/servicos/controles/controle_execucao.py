@@ -1,8 +1,10 @@
 import os
 from datetime import datetime
-from sqlalchemy.orm import sessionmaker
+
 import nfp.servicos.model as tables
 from nfp import CONEXAO
+from sqlalchemy import inspect
+from sqlalchemy.orm import sessionmaker
 
 
 class ControleExecucao(object):
@@ -11,12 +13,16 @@ class ControleExecucao(object):
     tarefa = None
     tarefa_nova = False
     engine = CONEXAO
-    DBSession = sessionmaker(bind=engine)
+
+    def __init__(self) -> None:
+        DBSession = sessionmaker(bind=CONEXAO)
+        self.session = DBSession()
+        self.session.expire_on_commit = False
 
     def configurar_base_de_dados(self):
-        self.DBSession.expire_on_commit = False
         if os.path.isfile(self.uri):
-            if not self.engine.dialect.has_table(self.engine, self.table_name):
+            inspec = inspect(self.engine)
+            if not inspec.has_table(self.table_name):
                 print('Tabela {} ainda não existe. Criando tabela...'.format(self.table_name))
                 base = tables.Base
                 base.metadata.create_all(self.engine)
@@ -27,7 +33,7 @@ class ControleExecucao(object):
         print('usando base de dados: ' + self.uri)
 
     def get_tarefa(self, tarefa_id):
-        session = self.DBSession()
+        session = self.session
         tarefa = tables.Tarefa
         query = session.query(tarefa).filter(
             tarefa.id == tarefa_id,
@@ -39,14 +45,14 @@ class ControleExecucao(object):
         colunas = self.localizar_colunas_faltantes()
         if not colunas:
             return
-        session = self.DBSession()
+        session = self.session
         for coluna, tipo in colunas.items():
             session.execute('ALTER TABLE %s ADD COLUMN %s %s' % (self.table_name, coluna, tipo))
         session.commit()
 
     def localizar_colunas_faltantes(self):
         tabela = self.table_name
-        session = self.DBSession()
+        session = self.session
         result = session.execute("SELECT name FROM PRAGMA_TABLE_INFO('%s')" % (tabela))
         colunas_bd = set()
         for coluna in result.fetchall():
@@ -66,7 +72,7 @@ class ControleExecucao(object):
         return None
 
     def extrair_dados_tarefa(self, tarefa_id):
-        session = self.DBSession()
+        session = self.session
         execucao = self.model
         # busca uma tarefa iniciada
         filtro = [execucao.tarefa_id == tarefa_id]
@@ -91,7 +97,7 @@ class ControleExecucao(object):
         return [colunas] + linhas
 
     def contador_processos_tarefa(self, tarefa_id):
-        session = self.DBSession()
+        session = self.session
         execucao = self.model
         query = session.query(execucao).filter(
             execucao.tarefa_id == tarefa_id
@@ -104,7 +110,7 @@ class ControleExecucao(object):
         return ex, tot
 
     def finalizar_tarefa(self):
-        session = self.DBSession()
+        session = self.session
         tarefa = tables.Tarefa
         robo = self.table_name
         # busca a tarefa iniciada
@@ -125,12 +131,12 @@ class ControleExecucao(object):
         return registro
 
     def limpar_tabela(self, tabela):
-        session = self.DBSession()
+        session = self.session
         session.execute('''DELETE FROM {}'''.format(tabela))
         session.commit()
 
     def reativar_tarefa(self, tarefa_id):
-        session = self.DBSession()
+        session = self.session
         tarefa = tables.Tarefa
         query = session.query(tarefa).filter(
             tarefa.id == tarefa_id,
@@ -141,7 +147,7 @@ class ControleExecucao(object):
         return True
 
     def selecionar_execucao(self, tarefa_id):
-        session = self.DBSession()
+        session = self.session
         execucao = self.model
         tarefa = tables.Tarefa
         # busca uma tarefa iniciada
@@ -169,7 +175,7 @@ class ControleExecucao(object):
         return registro
 
     def selecionar_tarefa_ativa(self, criar_nova=False):
-        session = self.DBSession()
+        session = self.session
         tarefa = tables.Tarefa
         robo = self.table_name
         # busca uma tarefa iniciada
@@ -194,7 +200,7 @@ class ControleExecucao(object):
         return None
 
     def selecionar_ultima_tarefa_finalizada(self):
-        session = self.DBSession()
+        session = self.session
         tarefa = tables.Tarefa
         robo = self.table_name
         # busca a ultima tarefa finalizada

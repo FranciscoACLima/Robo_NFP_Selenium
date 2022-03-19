@@ -2,31 +2,32 @@ import os
 from datetime import datetime
 import nfp.servicos.model as tables
 import nfp.servicos.controles.controle_execucao as ctrlexec
-from nfp import BASEDIR, URI
+from nfp import URI
 
 
-class ControleNFP(ctrlexec.ControleExecucao):
+class ControleDividePlanilha(ctrlexec.ControleExecucao):
 
     def __init__(self, entradas, uri):
         super().__init__()
         self.entradas = entradas
         self.uri = uri
-        self.table_name = 'notas_fiscais'
+        self.table_name = 'divide_planilha'
         self.configurar_base_de_dados()
-        self.model = tables.NotaFiscal
+        self.model = tables.DividePlanilha
+        self.atualizar_colunas_tabela()
 
     def carregar_entradas(self, tarefa_id):
         if not self.tarefa_nova:
             return 3, 'usando tarefa ativa'
         session = self.session
-        for entrada in self.entradas:
-            try:
-                registro = self.model()
-                registro.cod_nota = entrada[0]
-                registro.tarefa_id = tarefa_id
-                session.add(registro)
-            except IndexError as e:
-                return 1, str(e)
+        entrada_remota_id = 0
+        try:
+            registro = self.model()
+            registro.tarefa_id = tarefa_id
+            registro.entrada_remota_id = entrada_remota_id
+            session.add(registro)
+        except IndexError as e:
+            return 1, str(e)
         session.commit()
         return 0, 'entradas carregadas'
 
@@ -42,7 +43,7 @@ class ControleNFP(ctrlexec.ControleExecucao):
 
 # ---------- Funções do módulo -------------
 def carregar_entradas(entradas, uri=URI):
-    controle = ControleNFP(entradas, uri)
+    controle = ControleDividePlanilha(entradas, uri)
     tarefa = controle.selecionar_tarefa_ativa(criar_nova=True)
     if not tarefa:
         return 2, 'tarefa não configurada'
@@ -50,7 +51,7 @@ def carregar_entradas(entradas, uri=URI):
 
 
 def selecionar_execucao(uri=URI):
-    controle = ControleNFP([], uri)
+    controle = ControleDividePlanilha([], uri)
     tarefa = controle.selecionar_tarefa_ativa()
     if not tarefa:
         return None
@@ -58,22 +59,22 @@ def selecionar_execucao(uri=URI):
 
 
 def finalizar_execucao(id_execucao, retorno, uri=URI):
-    controle = ControleNFP([], uri)
+    controle = ControleDividePlanilha([], uri)
     return controle.finalizar_execucao(id_execucao, retorno)
 
 
 def finalizar_tarefa_ativa(uri=URI):
-    controle = ControleNFP([], uri)
+    controle = ControleDividePlanilha([], uri)
     return controle.finalizar_tarefa()
 
 
 def selecionar_tarefa_ativa(uri=URI):
-    controle = ControleNFP([], uri)
+    controle = ControleDividePlanilha([], uri)
     return controle.selecionar_tarefa_ativa()
 
 
 def selecionar_ultima_tarefa_finalizada(uri=URI):
-    controle = ControleNFP([], uri)
+    controle = ControleDividePlanilha([], uri)
     return controle.selecionar_ultima_tarefa_finalizada()
 
 
@@ -84,12 +85,12 @@ def extrair_dados_tarefa(tarefa_id, arquivo, uri=URI):
 
 
 def contar_processos_executados(tarefa_id, uri=URI):
-    controle = ControleNFP([], uri)
+    controle = ControleDividePlanilha([], uri)
     return controle.contador_processos_tarefa(tarefa_id)
 
 
 def listar_dados_tarefa(tarefa_id, uri=URI):
-    controle = ControleNFP([], uri)
+    controle = ControleDividePlanilha([], uri)
     registros = controle.extrair_dados_tarefa(tarefa_id)
     return registros
 

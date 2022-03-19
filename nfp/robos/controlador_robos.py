@@ -6,6 +6,7 @@ import xlrd
 import logging
 import time
 import os
+from nfp.robos.divide_planilha import DividePlanilha
 from nfp.robos.notas_fiscais import CadastraNFP
 from nfp.servicos.interface import abrir_popup
 
@@ -13,7 +14,7 @@ from nfp.servicos.interface import abrir_popup
 class ControladorRobos():
     robos = [
         {'codigo': 'notas_fiscais', 'robo': CadastraNFP},
-        {'codigo': 'divide_planilhas', 'robo': None}
+        {'codigo': 'divide_planilha', 'robo': DividePlanilha}
     ]
 
     def main(self, codigo, dict_parametros):
