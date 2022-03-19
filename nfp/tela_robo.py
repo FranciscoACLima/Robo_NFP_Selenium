@@ -32,6 +32,7 @@ class TelaRobo(SgBlocos, TelaRoot):
             self.font_titulo_robo = 'sfprodisplay 21 bold'
             self.font_input = 'sfprodisplay 8'
             self.left_ult_linha = 140
+        self.tam_linha = 65
 
     @property
     def cfg_win(self):
@@ -77,12 +78,10 @@ class TelaRobo(SgBlocos, TelaRoot):
     @property
     def robos(self):
         return [
-            {'cod': 'pagina_inicial',
-             'nome': 'Página Inicial'},
             {'cod': 'notas_fiscais',
              'nome': 'Grava Notas Fiscais'},
             {'cod': 'divide_planilha',
-             'nome': 'Divide uma Planilha em várias'}
+             'nome': 'Divide uma Planilha em Várias'}
         ]
 
     @property
@@ -113,9 +112,10 @@ class TelaRobo(SgBlocos, TelaRoot):
 
     # COLUNAS ROBO DIVIDE PLANILHA
     def col_esquerda_divide_planilha(self):
-        texto = 'Divide a planilha informada em várias, utilizando como referência uma quantidade de linhas ou '
-        texto += 'uma quantidade de planilhas'
-        texto1 = 'Após a inclusão das informações, clique em "Executar Robô" e aguarde a finalização da execução.'
+        texto = 'Este robô divide a planilha informada em várias, utilizando como referência uma quantidade de linhas ou '
+        texto += 'uma quantidade de planilhas.'
+        texto1 = 'O arquivo de entrada é a planilha Excel que será dividida.'
+        texto1 += '\n\n\nApós a inclusão das informações, clique em "Executar Robô" e aguarde a finalização da execução.'
         return [
             [sg.Text('O que faz este robô:', font=self.font_titulo)],
             [sg.Text(texto, size=(35, 6), font=self.font_texto)],
@@ -125,14 +125,15 @@ class TelaRobo(SgBlocos, TelaRoot):
 
     def col_direita_divide_planilha(self, prefixo):
         layout = []
-        tam = 66
+        tam = self.tam_linha
         layout.append([sg.Text(' ' * tam)])
         if not self.get_tarefa_ativa(prefixo):
             layout.append(self.arquivo_entrada(prefixo))
         layout.append(self.arquivo_saida(prefixo))
+        layout.append([sg.Text('_' * tam, (tam, 2))])
         layout.append(self.divisao_planilha_criterio(prefixo))
         layout.append(self.divisao_planilha_qtd(prefixo))
-        layout.append([sg.Text('_' * tam)])
+        layout.append(self.contem_titulo(prefixo))
         return layout
     # --------------------------------------------
 
@@ -140,7 +141,7 @@ class TelaRobo(SgBlocos, TelaRoot):
     def col_esquerda_notas_fiscais(self):
         texto = 'Este robô grava Nota Fiscal Paulista  para instituições sem fins lucrativos.'
         texto += '\nQuando o robô é executado, uma nova janela do navegador Google Chrome é aberta'
-        texto += '\nna página de login da nota fiscal.'
+        texto += ' na página de login da nota fiscal.'
         texto1 = 'O arquivo de entrada é uma planilha Excel contendo 1 coluna:'
         texto1 += '\n  1. código da nota fiscal'
         texto1 += '\n\nApós a inclusão das informações, clique em "Executar Robô"'
@@ -156,14 +157,13 @@ class TelaRobo(SgBlocos, TelaRoot):
 
     def col_direita_notas_fiscais(self, prefixo):
         layout = []
-        tam = 66
+        tam = self.tam_linha
         layout.append([sg.Text(' ' * tam)])
         if not self.get_tarefa_ativa(prefixo):
             layout.append(self.arquivo_entrada(prefixo))
         layout.append(self.sel_mes(prefixo))
         layout.append(self.sel_ano(prefixo))
-        layout.append([sg.Text(' ' * tam)])
-        layout.append([sg.Text(' ' * tam)])
+        layout.append([sg.Text('_' * tam, (tam, 2))])
         layout.append(self.sel_entidade(prefixo))
         return layout
 

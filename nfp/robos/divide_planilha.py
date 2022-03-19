@@ -1,3 +1,4 @@
+import logging
 import math
 import os
 
@@ -17,12 +18,16 @@ class DividePlanilha():
         self.tipo_planilha = 'excel'
         if '.csv' in self.path_planilha_entrada:
             self.tipo_planilha = 'csv'
+        self.header_plan = 0
+        if parametros['contem_titulo'] != 'Sim':
+            self.header_plan = None
         self.planilha = self._carrega_planilha()
         self.path_planilha_saida = parametros['arquivo_saida']
         if not self.path_planilha_saida:
             self.path_planilha_saida = os.path.dirname(self.path_planilha_entrada)
         self.criterio = parametros['divisao_planilha_criterio']
         self.quantidade = self._valida_quantidade(parametros['divisao_planilha_qtd'])
+        
 
     def main(self):
         while(True):
@@ -46,11 +51,13 @@ class DividePlanilha():
         end_slice_index = 0
         num_planilha = 1
         max_linhas = self._calcula_max_linhas_planilha_saida()
-        print('**********Máximo de linhas para cada planilha: {}'.format(max_linhas))
-        print('Formato: {}'.format(self.tipo_planilha))
+        logging.info(f'**********Máximo de linhas para cada planilha: {max_linhas}')
         nome_plan = os.path.basename(self.path_planilha_entrada)
         nome_plan = nome_plan.replace('.xlsx', '').replace('.xls', '').replace('.csv', '')
-        print(nome_plan)
+        logging.info(f'planilha: {nome_plan}')
+        header = True
+        if self.header_plan is None:
+            header = False
         while (end_slice_index < len(self.planilha)):
             start_slice_index = end_slice_index
             end_slice_index = end_slice_index + max_linhas
@@ -60,18 +67,16 @@ class DividePlanilha():
                                                      num_planilha, nome_plan, extensao)
             planilha_slice = self.planilha[start_slice_index:end_slice_index]
             if self.tipo_planilha == 'csv':
-                planilha_slice.to_csv(nome_arquivo, index=False)
+                planilha_slice.to_csv(nome_arquivo, index=False, header=header)
             else:
-                planilha_slice.to_excel(nome_arquivo, index=False)
+                planilha_slice.to_excel(nome_arquivo, index=False, header=header)
             num_planilha += 1
-            print('**********Linhas {} a {} gravadas no arquivo {}'.format(start_slice_index + 1,
-                                                                           end_slice_index,
-                                                                           nome_arquivo))
+            logging.info(f'**********Linhas {start_slice_index + 1} a {end_slice_index} gravadas no arquivo {nome_arquivo}')
 
     def _carrega_planilha(self):
         if 'csv' in self.path_planilha_entrada:
-            return pd.read_csv(self.path_planilha_entrada, encoding='utf8')
-        return pd.read_excel(self.path_planilha_entrada)
+            return pd.read_csv(self.path_planilha_entrada, encoding='utf8', header=self.header_plan)
+        return pd.read_excel(self.path_planilha_entrada, header=self.header_plan)
 
     def _qtd_linhas_planilha(self):
         return len(self.planilha)
@@ -104,11 +109,12 @@ class DividePlanilha():
 
 if __name__ == "__main__":
     parametros = {
-        'arquivo_entrada': r"C:\planilhas\teste divide planilhas\procs_testes.csv",
+        'arquivo_entrada': r"D:\ONE_DRIVE\OneDrive - Tribunal de Justica de Sao Paulo\Documentos\Notas Fiscais\Janeiro\Ultimo lote do mes 01.xlsx",
         'arquivo_saida': '',
         'divisao_planilha_criterio': 'Planilhas',
         'divisao_planilha_qtd': '4',
         'divisao_planilha_pacotes': '',
+        'contem_titulo': 'Não',
     }
     robo = DividePlanilha(parametros)
     robo.dividir_planilha()

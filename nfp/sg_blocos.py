@@ -1,8 +1,15 @@
 import PySimpleGUI as sg
 from nfp import INITIAL_FOLDER
 
-TAM_TXT = 24
-TAM_BOX = 45
+TAM_TXT = 15
+TAM_BOX = 50
+
+TAM_TXT_1 = 10
+TAM_BOX_1 = 62
+
+TAM_TXT_2 = 50
+TAM_BOX_2 = 15
+
 
 
 class SgBlocos():
@@ -16,8 +23,8 @@ class SgBlocos():
         ajuda += 'informações contidas na coluna ao lado'
         arq =self.get_cfg_win(prefixo + 'arquivo_entrada')
         return [
-            sg.Text('Planilha de Entrada:', size=(15, 1), font=self.font_label),
-            sg.Input(arq, key=prefixo + 'arquivo_entrada', size=(47, 1),
+            sg.Text('Planilha de Entrada:', size=(TAM_TXT, 1), font=self.font_label),
+            sg.Input(arq, key=prefixo + 'arquivo_entrada', size=(TAM_BOX, 1),
                         font=self.font_input,
                         tooltip=ajuda),
             sg.FileBrowse('Buscar', font=self.font_bt_menor, initial_folder=INITIAL_FOLDER)
@@ -30,9 +37,9 @@ class SgBlocos():
         if not valor:
             valor = 'Janeiro'
         return [
-            sg.Text('Mês de referência:', size=(15, 1), font=self.font_label),
+            sg.Text('Mês de referência:', size=(TAM_TXT, 1), font=self.font_label),
             sg.Combo(values=meses, key=prefixo + 'mes',
-                        size=(42, 1), default_value=valor,
+                        size=(TAM_BOX, 1), default_value=valor,
                         font=self.font_input, readonly=True)
         ]
 
@@ -46,9 +53,9 @@ class SgBlocos():
         if not valor:
             valor = ano_atual
         return [
-            sg.Text('Ano de referência:', size=(15, 1), font=self.font_label),
+            sg.Text('Ano de referência:', size=(TAM_TXT, 1), font=self.font_label),
             sg.Combo(values=meses, key=prefixo + 'ano',
-                        size=(42, 1), default_value=valor,
+                        size=(TAM_BOX, 1), default_value=valor,
                         font=self.font_input, readonly=True)
         ]
 
@@ -57,8 +64,8 @@ class SgBlocos():
         if not valor:
             valor = 'CREN - CENTRO DE RECUPERAÇÃO E EDUCAÇÃO NUTRICIONAL'
         return [
-            sg.Text('Entidade:', size=(7, 1), font=self.font_label),
-            sg.Input(valor, key=prefixo + 'entidade', size=(64, 1),
+            sg.Text('Entidade:', size=(TAM_TXT_1, 1), font=self.font_label),
+            sg.Input(valor, key=prefixo + 'entidade', size=(TAM_BOX_1, 1),
                         font=self.font_input)
         ]
 
@@ -75,9 +82,9 @@ class SgBlocos():
         else:
             texto = self.get_cfg_win(prefixo + 'arquivo_saida')
         return [
-            sg.Text('Diretório de Saída:', size=(15, 1), font=self.font_label),
+            sg.Text('Diretório de Saída:', size=(TAM_TXT, 1), font=self.font_label),
             sg.Input(texto,
-                    key=prefixo + 'arquivo_saida', size=(47, 1),
+                    key=prefixo + 'arquivo_saida', size=(TAM_BOX, 1),
                     font=self.font_input,
                     tooltip=ajuda
                     ),
@@ -95,9 +102,9 @@ class SgBlocos():
         else:
             texto = self.get_cfg_win(prefixo + 'diretorio_entrada')
         return [
-            sg.Text('Diretório de Entrada:', size=(15, 1), font=self.font_label),
+            sg.Text('Diretório de Entrada:', size=(TAM_TXT, 1), font=self.font_label),
             sg.Input(texto,
-                    key=prefixo + 'diretorio_entrada', size=(47, 1),
+                    key=prefixo + 'diretorio_entrada', size=(TAM_BOX, 1),
                     font=self.font_input
                     ),
             sg.FolderBrowse('Buscar', font=self.font_bt_menor)
@@ -112,34 +119,32 @@ class SgBlocos():
         valor = self.get_cfg_win(prefixo + 'divisao_planilha_criterio')
         if not valor:
             valor = 'Planilhas'
-        text = sg.Text('Divisão por quantidade de:', size=(38, 1), font=self.font_label)
+        text = sg.Text('Divisão por quantidade de:', size=(TAM_TXT_2, 1), font=self.font_label)
         combo = sg.Combo(values=opcoes, key=prefixo + 'divisao_planilha_criterio',
-                        size=(20, 1), default_value=valor,
+                        size=(TAM_BOX_2, 1), default_value=valor,
                         font=self.font_input, readonly=True)
         return [text, combo]
 
 
     def divisao_planilha_qtd(self, prefixo):
         return [
-            sg.Text('Em quantas planilhas/linhas será feita a divisão:', size=(38, 1), font=self.font_label),
+            sg.Text('Em quantas planilhas/linhas será a divisão:', size=(TAM_TXT_2, 1), font=self.font_label),
             sg.Input(self.get_cfg_win(prefixo + 'divisao_planilha_qtd'),
-                    key=prefixo + 'divisao_planilha_qtd', size=(20, 1),
+                    key=prefixo + 'divisao_planilha_qtd', size=(TAM_BOX_2, 1),
                     font=self.font_input)
         ]
 
-
-    def unificacao_planilhas_qtd_linhas_titulo(self, prefixo):
-        values = ['Sim', 'Não']
-        qtd_linhas = 'Sim'
-        if self.get_cfg_win(prefixo + 'qtd_linhas_titulo'):
-            try:
-                qtd = int(self.get_cfg_win(prefixo + 'qtd_linhas_titulo'))
-                if qtd < 1:
-                    qtd_linhas = 'Não'
-            except Exception:
-                qtd_linhas = self.get_cfg_win(prefixo + 'qtd_linhas_titulo')
-        return [
-            sg.Text('Planilhas contêm linha de título:', size=(50, 1), font=self.font_label),
-            sg.Combo(values=values, default_value=qtd_linhas,
-                    key=prefixo + 'qtd_linhas_titulo', size=(14, 1), font=self.font_input)
+    def contem_titulo(self, prefixo):
+        ajuda = 'Informe se a planilha contém ou não linha de título de colunas'
+        opcoes = [
+            'Sim',
+            'Não',
         ]
+        valor = self.get_cfg_win(prefixo + 'contem_titulo')
+        if not valor:
+            valor = 'Sim'
+        text = sg.Text('Planilha possui linha de título:', size=(TAM_TXT_2, 1), font=self.font_label)
+        combo = sg.Combo(values=opcoes, key=prefixo + 'contem_titulo',
+                        size=(TAM_BOX_2, 1), default_value=valor,
+                        font=self.font_input, readonly=True, tooltip=ajuda)
+        return [text, combo]
