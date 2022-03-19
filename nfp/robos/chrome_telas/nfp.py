@@ -40,12 +40,7 @@ class Nfp():
         return
 
     def _abrir_chrome(self):
-        chrexec = [
-            CHREXEC,
-            '--remote-debugging-port=9222',
-            '--user-data-dir="{}"'.format(CHRPREFS),
-            URLBASE
-        ]
+        chrexec = [CHREXEC, '--remote-debugging-port=9222','--user-data-dir={}'.format(CHRPREFS.replace(' ', '\ ')), URLBASE]
         if sys.platform == "win32":
             chrexec = '"{}" --remote-debugging-port=9222 --user-data-dir="{}" {}'.format(CHREXEC, CHRPREFS, URLBASE)
         Popen(chrexec, shell=False, stdout=PIPE).stdout

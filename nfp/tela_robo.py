@@ -26,13 +26,19 @@ class TelaRobo(SgBlocos, TelaRoot):
         self.titulo = 'Robôs Nota Fiscal Paulista'
         sg.ChangeLookAndFeel('GreenTan')
         self.size_win = (967, 500)
+        self.size_d = (558, 380)
         self.left_ult_linha = 145
+        self.tam_linha = 65
+        self.pad_titulo = (20, 5)
         if platform.system() == 'Linux':
-            self.size_win = (952, 500)
+            self.size_win = (962, 500)
+            self.size_d = (578, 380)
+            self.pad_titulo = (30, 5)
             self.font_titulo_robo = 'sfprodisplay 21 bold'
             self.font_input = 'sfprodisplay 8'
             self.left_ult_linha = 140
-        self.tam_linha = 65
+            self.tam_linha = 80
+
 
     @property
     def cfg_win(self):
@@ -53,7 +59,7 @@ class TelaRobo(SgBlocos, TelaRoot):
         """
         selecionado = self.get_cfg_win('robo_selecionado')
         linhas = []
-        linhas += [sg.Menu(self.menu, tearoff=True)]
+        linhas += [sg.Menu(self.menu, tearoff=False)]
         for robo in self.robos:
             visivel = False
             if robo['cod'] == selecionado:
@@ -220,17 +226,17 @@ class TelaRobo(SgBlocos, TelaRoot):
                 2. Direita -> Formulários
         """
         # define uma linha vertical entre as colunas com exceção à pagina inicial
-        separador_vertical = sg.VerticalSeparator(pad=None)
+        separador_vertical = sg.VerticalSeparator(color='black', pad=None)
         if robo['cod'] == 'pagina_inicial':
             separador_vertical = sg.Column([])
         if not size_e:
             size_e = (300, 380)
         if not size_d:
-            size_d = (558, 380)
+            size_d = self.size_d
         return [
             [sg.Text(
                 robo['nome'],
-                pad=(20, 5),
+                pad=self.pad_titulo,
                 justification='center',
                 font=self.font_titulo_robo,
                 relief=sg.RELIEF_RIDGE,
@@ -241,7 +247,7 @@ class TelaRobo(SgBlocos, TelaRoot):
                 sg.Column(
                     col_e,
                     size=size_e,
-                    pad=(6, 0),
+                    pad=(10, 0),
                     scrollable=scroll,
                     vertical_scroll_only=scroll
                 ),
@@ -293,7 +299,7 @@ class TelaRobo(SgBlocos, TelaRoot):
             layout,
             visible=visivel,
             key=robo['cod'],
-            size=(970, 550),
+            size=self.size_win,
             pad=(0, 0),
         )
 
