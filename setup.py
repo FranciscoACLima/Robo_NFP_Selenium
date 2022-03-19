@@ -31,7 +31,7 @@ base = None
 
 setup(
     name="RoboNFP",
-    version="0.0.4",
+    version="0.1.0",
     description="Robô para cadastro de Nota Fiscal Paulista",
     options={"build_exe": build_exe_options},
     executables=[Executable("run.py", base=base, target_name='RoboNFP', icon="ico.ico")])
