@@ -25,11 +25,11 @@ class TelaRobo(SgBlocos, TelaRoot):
     def __init__(self):
         self.titulo = 'Robôs Nota Fiscal Paulista'
         sg.ChangeLookAndFeel('GreenTan')
-        self.size_win = (967, 500)
+        self.size_win = (950, 500)
         self.size_d = (558, 380)
         self.left_ult_linha = 145
-        self.tam_linha = 65
-        self.pad_titulo = (20, 5)
+        self.tam_linha = 67
+        self.pad_titulo = (40, 5)
         if platform.system() == 'Linux':
             self.size_win = (962, 500)
             self.size_d = (578, 380)
