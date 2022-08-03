@@ -11,7 +11,7 @@ locale.setlocale(locale.LC_ALL, 'pt_BR.utf8')
 
 logging.basicConfig(level='INFO')
 
-VERSAO = '0.0.4 - ALPHA'
+VERSAO = '0.1.1 - BETA'
 
 BASEDIR = os.path.dirname(__file__)
 CONFIG_FILE = "config_maquina.json"
