@@ -11,10 +11,10 @@ from nfp.robos.notas_fiscais import CadastraNFP
 from nfp.servicos.interface import abrir_popup
 
 
-class ControladorRobos():
+class ControladorRobos:
     robos = [
-        {'codigo': 'notas_fiscais', 'robo': CadastraNFP},
-        {'codigo': 'divide_planilha', 'robo': DividePlanilha}
+        {"codigo": "notas_fiscais", "robo": CadastraNFP},
+        {"codigo": "divide_planilha", "robo": DividePlanilha},
     ]
 
     def main(self, codigo, dict_parametros):
@@ -24,21 +24,23 @@ class ControladorRobos():
         dict_parametros_robo_ativo = {}
         for key, value in dict_parametros.items():
             if self.codigo_robo in str(key):
-                key = key.replace(self.codigo_robo, '')
+                key = key.replace(self.codigo_robo, "")
                 dict_parametros_robo_ativo[key] = value
-        select = list(filter(lambda x: (x['codigo'] == self.codigo_robo), self.robos))
+        select = list(filter(lambda x: (x["codigo"] == self.codigo_robo), self.robos))
         if not select:
-            raise Exception('Codigo Robo {} invalido'.format(self.codigo_robo))
+            raise Exception("Codigo Robo {} invalido".format(self.codigo_robo))
         self.select = select
         package = "nfp.servicos.controles.{}".format(self.codigo_robo)
         ctrl = il.import_module(package)
         try:
             tarefa_ativa = ctrl.selecionar_tarefa_ativa()
             if not tarefa_ativa:
-                if not dict_parametros_robo_ativo['arquivo_entrada'].strip():
+                if not dict_parametros_robo_ativo["arquivo_entrada"].strip():
                     return "ERRO: Nenhuma planilha informada"
                 try:
-                    entradas = self.extrair_dados_planilhas(dict_parametros_robo_ativo['arquivo_entrada'])
+                    entradas = self.extrair_dados_planilhas(
+                        dict_parametros_robo_ativo["arquivo_entrada"]
+                    )
                 except Exception as e:
                     return str(e)
                 if not entradas:
@@ -47,19 +49,21 @@ class ControladorRobos():
                 valor = retorno[0]
                 texto = retorno[1]
                 if valor > 0:
-                    msg = 'Erro no carregamento das entradas "{}" - cod erro {}'.format(texto, valor)
+                    msg = 'Erro no carregamento das entradas "{}" - cod erro {}'.format(
+                        texto, valor
+                    )
                     return msg
                 tarefa_ativa = ctrl.selecionar_tarefa_ativa()
-            logging.info('Entradas carregadas e tarefa ativa selecionada')
+            logging.info("Entradas carregadas e tarefa ativa selecionada")
             # confere se a tarefa possui entradas
             contador = ctrl.contar_processos_executados(tarefa_ativa.id)
             if not contador[1]:
-                msg = 'Tarefa nao possui entradas para trabalhar'
+                msg = "Tarefa nao possui entradas para trabalhar"
                 return msg
-            robo = select[0]['robo'](dict_parametros_robo_ativo)
+            robo = select[0]["robo"](dict_parametros_robo_ativo)
             # executa o robô
             retorno = robo.main()
-            dir_saida = dict_parametros_robo_ativo['dir_saida']
+            dir_saida = dict_parametros_robo_ativo["dir_saida"]
             extrair_resultados(self.codigo_robo, retorno, dir_saida)
             return
         except Exception as e:
@@ -72,7 +76,7 @@ class ControladorRobos():
             wb = xlrd.open_workbook(arquivo)
         except IOError as io:
             print(io)
-            raise ex.PlanilhaInexistenteException('Planilha de entrada inexistente.')
+            raise ex.PlanilhaInexistenteException("Planilha de entrada inexistente.")
         except Exception as e:
             print(e)
             raise ex.ErroExtracaoDadosPlanilhaException(e)
@@ -94,31 +98,31 @@ class ControladorRobos():
 # ---------- função de módulo ------------
 def extrair_resultados(codigo, ativa, dir_saida):
     data_hora = time.strftime("%Y%m%d-%H%M", time.gmtime())
-    msg = 'Tarefa completada. \nGravando planilha com os resultados...'
-    abrir_popup(texto=msg, tempo=5)
+    msg = "Tarefa completada. \nGravando planilha com os resultados..."
+    abrir_popup(texto=msg, tempo=5, title="Tarefa Completada")
     package = "nfp.servicos.controles.{}".format(codigo)
     ctrl = il.import_module(package)
-    arquivo = 'result_' + str(ativa.id) + '_' + codigo + '_' + data_hora + '.xlsx'
+    arquivo = "result_" + str(ativa.id) + "_" + codigo + "_" + data_hora + ".xlsx"
     path_arquivo = os.path.join(dir_saida, arquivo)
     retorno = ctrl.extrair_dados_tarefa(ativa.id, path_arquivo)
-    msg = '\n Tarefa não finalizada.'
+    msg = "\n Tarefa não finalizada."
     if retorno[0] == 0:
         if ctrl.finalizar_tarefa_ativa():
-            msg = '\n Tarefa finalizada.'
+            msg = "\n Tarefa finalizada."
     texto = retorno[1] + msg
-    abrir_popup(texto=texto)
+    abrir_popup(texto=texto, title=msg.replace("\n ", ""))
 
 
 # --------------------------------------
 if __name__ == "__main__":
     parametros = {
-        'codigo': 'notas_fiscais',
-        'notas_fiscaismes': '08',
-        'notas_fiscaisano': '2020',
-        'notas_fiscaisentidade': 'CREN - CENTRO DE RECUPERAÇÃO E EDUCAÇÃO NUTRICIONAL',
-        'notas_fiscaisdir_saida': 'C:/DevApps',
-        'notas_fiscaisarquivo_entrada': r"C:\Users\franc\Documents\Notas fiscais 2020\agosto\teste_1.xlsx"
+        "codigo": "notas_fiscais",
+        "notas_fiscaismes": "08",
+        "notas_fiscaisano": "2020",
+        "notas_fiscaisentidade": "CREN - CENTRO DE RECUPERAÇÃO E EDUCAÇÃO NUTRICIONAL",
+        "notas_fiscaisdir_saida": "C:/DevApps",
+        "notas_fiscaisarquivo_entrada": r"C:\Users\franc\Documents\Notas fiscais 2020\agosto\teste_1.xlsx",
     }
     controle = ControladorRobos()
-    result = controle.main('notas_fiscais', parametros)
-    print('Resultado:', result)
+    result = controle.main("notas_fiscais", parametros)
+    print("Resultado:", result)
