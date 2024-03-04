@@ -20,10 +20,21 @@ def baixar_arquivo(arquivo, origem, destino):
     return str(response)
 
 
-def descompactar(arquivo, path):
+def descompactar(arquivo, destino):
     import zipfile
+    from pathlib import Path
+    import shutil
+    import os
+
     with zipfile.ZipFile(arquivo, 'r') as zip_ref:
-        zip_ref.extractall(path)
+        zip_ref.extractall(destino)      
+    nome_dir = Path(arquivo).name
+    nome_dir = nome_dir.replace(".zip", '.')
+    destino = Path(destino)
+    path_exec = destino / nome_dir / 'chromedriver.exe'
+    shutil.move(path_exec, destino)
+    os.unlink(arquivo)
+    shutil.rmtree(destino / nome_dir)
 
 
 def conferir_chrome():
@@ -80,7 +91,7 @@ def _get_versao_chrome_windows():
     exec_chrome = CHREXEC.replace('/', '\\').replace('\\', '\\\\')
     cmd = r'wmic datafile where name="{}" get Version /value'.format(exec_chrome)
     result = executar_comando_com_retorno(cmd)
-    if not('Version' in result):
+    if 'Version' not in result:
         return 0
     pos_i = result.find('=')
     pos_f = result.find('.')
@@ -95,18 +106,18 @@ def baixar_chromedriver(versao):
         sistema = 'win32'
     elif platform == 'darwin':
         sistema = 'mac_64'
-    url = f'https://chromedriver.storage.googleapis.com/LATEST_RELEASE_{versao}'
+    url = f'https://googlechromelabs.github.io/chrome-for-testing/LATEST_RELEASE_{versao}'
     r = requests.get(url)
     if r.status_code != 200:
         raise Exception(f'Erro ao buscar ultimo release chromedriver versao {versao} - cod {r.status_code}')
     print(r.status_code)
     last_release = r.content.decode('utf-8')
-    arquivo = f'chromedriver_{sistema}.zip'
+    arquivo = f'chromedriver-{sistema}.zip'
     destino = os.path.join(BASEDIR, 'binaries')
     if os.path.isdir(destino):
         rmtree(destino)
     os.mkdir(destino)
-    url = f'https://chromedriver.storage.googleapis.com/{last_release}'
+    url = f'https://storage.googleapis.com/chrome-for-testing-public/{last_release}/{sistema}'
     arq_zip = baixar_arquivo(arquivo, url, destino)
     print(arq_zip)
     descompactar(arq_zip, destino)
