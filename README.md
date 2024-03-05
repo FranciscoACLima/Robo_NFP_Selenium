@@ -75,3 +75,8 @@ O robô utiliza a biblioteca [Selenium](https://www.selenium.dev/) para automati
 A partir da versão 0.0.3, aplicação verifica a versão do navegador **Chrome** instalado e faz o donwload da versão do **crhomedriver** correspondente de forma automática.
 
 
+## Build para executável Windows
+
+Testado no Python3.10
+
+`python setup.py build`
