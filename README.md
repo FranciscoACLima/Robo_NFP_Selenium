@@ -13,7 +13,7 @@ Para auxiliar na distribuição da execução do robô em mais de um computador,
 
 ## Executável para Windows 64
 
-https://github.com/FranciscoACLima/Robo_NFP_Selenium/releases/download/0.1.1/RoboNFP_WIN64.zip
+https://github.com/FranciscoACLima/Robo_NFP_Selenium/releases/download/0.1.2/RoboNFP_WIN64.zip
 
 ## Preparação do código para criação do ambiente de desenvolvimento
 
