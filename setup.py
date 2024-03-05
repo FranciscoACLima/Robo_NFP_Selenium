@@ -14,9 +14,9 @@ for file in local_files:
 
 build_exe_options = {
     "packages": [
-        "sqlalchemy"
+        "sqlalchemy", 
     ],
-    "includes": [],
+    "includes": ["tkinter"],
     "include_files": [],
     "excludes": [
         'nfp.prefs_chrome',
@@ -31,7 +31,7 @@ base = None
 
 setup(
     name="RoboNFP",
-    version="0.1.0",
+    version="0.1.2",
     description="Robô para cadastro de Nota Fiscal Paulista",
     options={"build_exe": build_exe_options},
     executables=[Executable("run.py", base=base, target_name='RoboNFP', icon="ico.ico")])
